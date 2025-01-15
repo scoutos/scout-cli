@@ -7,5 +7,6 @@
     "semiColons": false,
     "singleQuote": true,
     "proseWrap": "preserve"
-  }
+  },
+  "unstable": ["kv"]
 }
