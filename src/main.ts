@@ -27,16 +27,15 @@ function printHelp(): void {
   console.log('  -c, --color               Set the color of the greeting')
 }
 
-const greetings = [
-  'Hello',
-  'Hi',
-  'Hey',
-  'Good day',
-  'Good morning',
-  'Good evening',
-]
-
 function main(inputArgs: string[]) {
+  const greetings = [
+    'Hello',
+    'Hi',
+    'Hey',
+    'Good day',
+    'Good morning',
+    'Good evening',
+  ]
   const args = parseArguments(inputArgs)
 
   if (args.help) {
