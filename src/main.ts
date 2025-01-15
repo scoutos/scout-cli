@@ -49,13 +49,18 @@ async function main(inputArgs: string[]): Promise<void> {
 
   // Open KV key-value data store
   const kv = await Deno.openKv('/tmp/kv.db')
-  // let askToSave = false;
 
   if (!name) {
     name = (await kv.get(['name'])).value as string
+    if (!name) {
+      console.log('No name found, please enter a name:')
+    }
   }
   if (!color) {
     color = (await kv.get(['color'])).value as string
+    if (!color) {
+      console.log('No color found, please enter a color:')
+    }
   }
   if (save) {
     await kv.set(['name'], name)
