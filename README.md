@@ -1,45 +1,34 @@
-# Scout CLI
+# scout-cli
 
-Scout CLI allows one to interact with and update Scout workflows via
-[CLI](https://en.wikipedia.org/wiki/Command-line_interface).
+`scout-cli` allows one to interact with and update Scout workflows via
+[CLI](https://en.wikipedia.org/wiki/Command-line_interface) commands.
 
 ## Development
 
-Clone the repo
+1. Clone and setup:
 
 ```bash
 git clone git@github.com:scoutos/scout-cli.git
+cd scout-cli
 ```
 
-[Install Deno](https://docs.deno.com/runtime/getting_started/installation/)
+2. Install prerequisites:
 
-[Setup your environment](https://docs.deno.com/runtime/getting_started/setup_your_environment/)
+- [Install Deno](https://docs.deno.com/runtime/getting_started/installation/)
+- [Setup your development environment](https://docs.deno.com/runtime/getting_started/setup_your_environment/)
 
-Install scout-cli locally
+3. Install `scout-cli`:
 
 ```bash
 deno install --allow-read --allow-write -n scout-cli src/main.ts --global
 ```
 
-**Note**: You may have to add Deno to your `PATH`
-
-1. First, let's find out where Deno installed the executable:
-
-```bash
-echo "$HOME/.deno/bin"
-```
-
-2. You need to add this path to your shell's PATH variable. For ZSH, add this line to your ~/.zshrc file:
-
-```bash
-export PATH="$HOME/.deno/bin:$PATH"
-```
-
-3. Either restart your terminal or run:
-
-```bash
-source ~/.zshrc
-```
+> **Note**: If Deno isn't in your PATH, run:
+>
+> ```bash
+> echo 'export PATH="$HOME/.deno/bin:$PATH"' >> ~/.zshrc
+> source ~/.zshrc
+> ```
 
 After you make updates to this repo locally and want to test the `scout-cli` you can run the following to replace your existing copy:
 
