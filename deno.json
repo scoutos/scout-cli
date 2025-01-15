@@ -2,5 +2,10 @@
   "tasks": {
     "lint": "deno lint",
     "format": "deno fmt"
+  },
+  "fmt": {
+    "semiColons": false,
+    "singleQuote": true,
+    "proseWrap": "preserve"
   }
 }
