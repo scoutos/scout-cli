@@ -25,7 +25,14 @@ function printHelp(): void {
   console.log("  -c, --color               Set the color of the greeting");
 }
 
-const greetings = ["Hello", "Hi", "Hey", "Good day", "Good morning", "Good evening"];
+const greetings = [
+  "Hello",
+  "Hi",
+  "Hey",
+  "Good day",
+  "Good morning",
+  "Good evening",
+];
 function main(inputArgs: string[]): void {
   const args = parseArguments(inputArgs);
 
