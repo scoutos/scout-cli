@@ -53,7 +53,7 @@ function main(inputArgs: string[]) {
 
   console.log(
     `%c${
-      greetings[Math.floor(Math.random() * greetings.length) - 1]
+      greetings[Math.floor(Math.random() * greetings.length)]
     }, ${name}!`,
     `color: ${color}; font-weight: bold`,
   )
