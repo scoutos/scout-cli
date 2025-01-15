@@ -1,3 +1,5 @@
+#!/usr/bin/env -S deno run --allow-read --allow-write
+
 import { parseArgs } from 'https://deno.land/std@0.218.0/cli/parse_args.ts'
 import type { ParseOptions } from 'https://deno.land/std@0.218.0/cli/parse_args.ts'
 
@@ -34,37 +36,20 @@ const greetings = [
   'Good evening',
 ]
 
-async function main(inputArgs: string[]): Promise<void> {
+function main(inputArgs: string[]) {
   const args = parseArguments(inputArgs)
 
-  // If help flag enabled, print help.
   if (args.help) {
     printHelp()
     Deno.exit(0)
   }
 
   let name: string | null = args.name
-  let color: string | null = args.color
-  const save: boolean = args.save
-
-  // Open KV key-value data store
-  const kv = await Deno.openKv('/tmp/kv.db')
+  const color: string | null = args.color
 
   if (!name) {
-    name = (await kv.get(['name'])).value as string
-    if (!name) {
-      console.log('No name found, please enter a name:')
-    }
-  }
-  if (!color) {
-    color = (await kv.get(['color'])).value as string
-    if (!color) {
-      console.log('No color found, please enter a color:')
-    }
-  }
-  if (save) {
-    await kv.set(['name'], name)
-    await kv.set(['color'], color)
+    console.log('Please enter your name:')
+    name = prompt('Name:') || 'Anonymous'
   }
 
   console.log(

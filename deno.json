@@ -1,12 +1,19 @@
 {
+  "name": "scout-cli",
+  "version": "0.0.0",
+  "exports": "./src/main.ts",
   "tasks": {
     "lint": "deno lint",
-    "format": "deno fmt"
+    "format": "deno fmt",
+    "dev": "deno run --allow-read --allow-write src/main.ts"
   },
   "fmt": {
     "semiColons": false,
     "singleQuote": true,
     "proseWrap": "preserve"
   },
-  "unstable": ["kv"]
+  "install": {
+    "name": "scout-cli",
+    "exe": "scout-cli"
+  }
 }
