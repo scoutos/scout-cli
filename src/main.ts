@@ -15,11 +15,9 @@ function parseArguments(args: string[]) {
     alias: {
       'h': 'help',
       's': 'save',
-      'n': 'name',
-      'c': 'color',
     },
     boolean: ['help', 'save', 'delete-apikey'],
-    string: ['name', 'color', 'apikey', 'get-workflow'],
+    string: ['apikey', 'get-workflow'],
   }
 
   return parseArgs(args, config)
@@ -30,8 +28,6 @@ function printHelp(): void {
   console.log('\nOptional flags:')
   console.log('  -h, --help                Display this help and exit')
   console.log('  -s, --save                Save settings for future greetings')
-  console.log('  -n, --name                Set your name for the greeting')
-  console.log('  -c, --color               Set the color of the greeting')
   console.log('  -k, --apikey              Set your API key for authentication')
   console.log('  -d, --delete-apikey       Delete your API key')
   console.log('      --get-workflow        Get workflow by ID')
@@ -91,14 +87,6 @@ async function getWorkflow(workflowId: string, apiKey: string): Promise<void> {
 }
 
 async function main(inputArgs: string[]) {
-  const greetings = [
-    'Hello',
-    'Hi',
-    'Hey',
-    'Good day',
-    'Good morning',
-    'Good evening',
-  ]
   const args = parseArguments(inputArgs)
 
   if (args.help) {
@@ -124,23 +112,13 @@ async function main(inputArgs: string[]) {
     await saveApiKey(apiKey)
   }
 
-  let name: string | null = args.name
-  const color: string | null = args.color
-
-  if (!name) {
-    console.log('Please enter your name:')
-    name = prompt('Name:') || 'Anonymous'
-  }
-
   if (args['get-workflow']) {
     await getWorkflow(args['get-workflow'], apiKey)
     Deno.exit(0)
   }
 
-  console.log(
-    `%c${greetings[Math.floor(Math.random() * greetings.length)]}, ${name}!`,
-    `color: ${color}; font-weight: bold`,
-  )
+  // If no specific command was given, show help
+  printHelp()
 }
 
 main(Deno.args)
