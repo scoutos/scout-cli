@@ -14,9 +14,8 @@ function parseArguments(args: string[]) {
   const config: ParseOptions = {
     alias: {
       'h': 'help',
-      's': 'save',
     },
-    boolean: ['help', 'save', 'delete-apikey'],
+    boolean: ['help', 'delete-apikey'],
     string: ['apikey', 'get-workflow'],
   }
 
@@ -24,10 +23,8 @@ function parseArguments(args: string[]) {
 }
 
 function printHelp(): void {
-  console.log(`Usage: greetme [OPTIONS...]`)
   console.log('\nOptional flags:')
   console.log('  -h, --help                Display this help and exit')
-  console.log('  -s, --save                Save settings for future greetings')
   console.log('  -k, --apikey              Set your API key for authentication')
   console.log('  -d, --delete-apikey       Delete your API key')
   console.log('      --get-workflow        Get workflow by ID')
