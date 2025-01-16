@@ -20,7 +20,7 @@ cd scout-cli
 3. Install `scout-cli`:
 
 ```bash
-deno install --allow-read --allow-write -n scout-cli src/main.ts --global
+deno install --allow-read --allow-write --allow-env -n scout-cli src/main.ts --global
 ```
 
 > **Note**: If Deno isn't in your PATH, run:
@@ -33,7 +33,7 @@ deno install --allow-read --allow-write -n scout-cli src/main.ts --global
 After you make updates to this repo locally and want to test the `scout-cli` you can run the following to replace your existing copy:
 
 ```bash
-deno install --allow-read --allow-write -n scout-cli src/main.ts --global -f
+deno install --allow-read --allow-write --allow-env -n scout-cli src/main.ts --global -f
 ```
 
 ### Using CLI

@@ -15,5 +15,10 @@
   "install": {
     "name": "scout-cli",
     "exe": "scout-cli"
+  },
+  "permissions": {
+    "read": ["$HOME/.scout-cli"],
+    "write": ["$HOME/.scout-cli"],
+    "env": ["HOME", "USERPROFILE"]
   }
 }
