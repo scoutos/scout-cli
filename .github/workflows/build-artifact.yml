@@ -11,7 +11,7 @@ on:
 
 jobs:
   build:
-    name: Build CLI
+    name: Build CLI Artifact
     runs-on: ${{ matrix.os }}
 
     strategy:
