@@ -19,7 +19,7 @@ function parseArguments(args: string[]) {
       'c': 'color',
     },
     boolean: ['help', 'save', 'delete-apikey'],
-    string: ['name', 'color', 'apikey'],
+    string: ['name', 'color', 'apikey', 'get-workflow'],
   }
 
   return parseArgs(args, config)
@@ -34,6 +34,7 @@ function printHelp(): void {
   console.log('  -c, --color               Set the color of the greeting')
   console.log('  -k, --apikey              Set your API key for authentication')
   console.log('  -d, --delete-apikey       Delete your API key')
+  console.log('      --get-workflow        Get workflow by ID')
 }
 
 async function getStoredApiKey(): Promise<string | null> {
@@ -63,6 +64,29 @@ async function deleteApiKey(): Promise<void> {
     console.log('API key deleted successfully')
   } catch {
     console.log('No stored API key found')
+  }
+}
+
+async function getWorkflow(workflowId: string, apiKey: string): Promise<void> {
+  try {
+    const response = await fetch(
+      `https://api-prod.scoutos.com/v2/workflows/${workflowId}`,
+      {
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+        },
+      },
+    )
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+    
+    const workflow = await response.json()
+    console.log(JSON.stringify(workflow, null, 2))
+  } catch (error) {
+    console.error('Failed to fetch workflow:', error)
+    Deno.exit(1)
   }
 }
 
@@ -106,6 +130,11 @@ async function main(inputArgs: string[]) {
   if (!name) {
     console.log('Please enter your name:')
     name = prompt('Name:') || 'Anonymous'
+  }
+
+  if (args['get-workflow']) {
+    await getWorkflow(args['get-workflow'], apiKey)
+    Deno.exit(0)
   }
 
   console.log(
