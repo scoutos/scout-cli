@@ -2,14 +2,18 @@ import { parseArgs } from 'https://deno.land/std@0.218.0/cli/parse_args.ts'
 import { join } from 'https://deno.land/std@0.218.0/path/mod.ts'
 import type { ParseOptions } from 'https://deno.land/std@0.218.0/cli/parse_args.ts'
 
-const CONFIG_DIR = join(
-  Deno.env.get('HOME') || Deno.env.get('USERPROFILE') || '.',
-  '.scout-cli',
-)
-const CONFIG_FILE = join(CONFIG_DIR, 'secrets.json')
+export const config = {
+  CONFIG_DIR: join(
+    Deno.env.get('HOME') || Deno.env.get('USERPROFILE') || '.',
+    '.scout-cli',
+  ),
+  get CONFIG_FILE() {
+    return join(this.CONFIG_DIR, 'secrets.json')
+  }
+}
 
 function parseArguments(args: string[]) {
-  const config: ParseOptions = {
+  const parseConfig: ParseOptions = {
     alias: {
       'h': 'help',
     },
@@ -17,7 +21,7 @@ function parseArguments(args: string[]) {
     string: ['apikey', 'get-workflow'],
   }
 
-  return parseArgs(args, config)
+  return parseArgs(args, parseConfig)
 }
 
 function printHelp(): void {
@@ -30,8 +34,8 @@ function printHelp(): void {
 
 async function getStoredApiKey(): Promise<string | null> {
   try {
-    const config = await Deno.readTextFile(CONFIG_FILE)
-    return JSON.parse(config).apiKey || null
+    const configData = await Deno.readTextFile(config.CONFIG_FILE)
+    return JSON.parse(configData).apiKey || null
   } catch {
     return null
   }
@@ -39,19 +43,19 @@ async function getStoredApiKey(): Promise<string | null> {
 
 async function saveApiKey(apiKey: string): Promise<void> {
   try {
-    await Deno.mkdir(CONFIG_DIR, { recursive: true })
+    await Deno.mkdir(config.CONFIG_DIR, { recursive: true })
     // Check if secrets.json exists and is a directory
     try {
-      const fileInfo = await Deno.stat(CONFIG_FILE)
+      const fileInfo = await Deno.stat(config.CONFIG_FILE)
       if (fileInfo.isDirectory) {
         // Remove the directory if it exists
-        await Deno.remove(CONFIG_FILE, { recursive: true })
+        await Deno.remove(config.CONFIG_FILE, { recursive: true })
       }
     } catch {
       // If file doesn't exist, that's fine
     }
-    const config = { apiKey }
-    await Deno.writeTextFile(CONFIG_FILE, JSON.stringify(config, null, 2))
+    const configData = { apiKey }
+    await Deno.writeTextFile(config.CONFIG_FILE, JSON.stringify(configData, null, 2))
   } catch (error) {
     console.error('Failed to save API key:', error)
     throw error
@@ -60,7 +64,7 @@ async function saveApiKey(apiKey: string): Promise<void> {
 
 async function deleteApiKey(): Promise<void> {
   try {
-    await Deno.remove(CONFIG_FILE)
+    await Deno.remove(config.CONFIG_FILE)
     console.log('API key deleted successfully')
   } catch {
     console.log('No stored API key found')
