@@ -43,11 +43,67 @@ When you first use the cli tool, you will be asked to set your `apikey`. This sh
 Example command:
 
 ```bash
-scout-cli --name=Jiggy
+scout-cli --get-workflow=workflow_id_123
 ```
 
-Should output something like:
+Should output:
 
 ```
-Good morning, Jiggy!
+{
+  "data": {
+    "workflow_config": {
+      "workflow_display_name": "Workflow Name",
+      "workflow_schema_version": "1.0",
+      "workflow_img_url": "123",
+      "workflow_description": null,
+      "blocks": [
+        {
+          "block_archetype_id": "com.scoutos.input",
+          "block_config": [],
+          "block_display_name": "Inputs",
+          "block_id": "inputs",
+          "block_inputs": {
+            "items": [
+              {
+                "display_name": "User's Message",
+                "input_type": "long_text",
+                "is_optional": false,
+                "key": "user_message"
+              }
+            ]
+          },
+          "block_is_output": false,
+          "dependencies": [],
+          "input_schema": {},
+          "output_schema": [],
+          "ui": {
+            "position": {
+              "x": 5,
+              "y": -173
+            }
+          },
+          "trigger_config": null
+        }
+      ]
+    },
+    "last_updated_at": "2025-01-15T16:12:36.874880Z",
+    "created_at": "2025-01-10T15:33:04.483387Z",
+    "created_by": {
+      "type": "user",
+      "details": {
+        "user_id": "123",
+        "org_id": "123",
+        "scout_organization_id": "1223",
+        "email": {
+          "primary": "123",
+          "verified": true
+        }
+      }
+    },
+    "last_updated_by": {},
+    "revision_id": "123",
+    "workflow_id": "123",
+    "is_draft": true
+  }
+}
 ```
