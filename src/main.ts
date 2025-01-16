@@ -77,11 +77,11 @@ async function getWorkflow(workflowId: string, apiKey: string): Promise<void> {
         },
       },
     )
-    
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`)
     }
-    
+
     const workflow = await response.json()
     console.log(JSON.stringify(workflow, null, 2))
   } catch (error) {
