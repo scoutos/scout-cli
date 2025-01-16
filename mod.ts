@@ -42,10 +42,10 @@ async function saveApiKey(apiKey: string): Promise<void> {
     await Deno.mkdir(CONFIG_DIR, { recursive: true })
     // Check if secrets.json exists and is a directory
     try {
-      const fileInfo = await Deno.stat(CONFIG_FILE);
+      const fileInfo = await Deno.stat(CONFIG_FILE)
       if (fileInfo.isDirectory) {
         // Remove the directory if it exists
-        await Deno.remove(CONFIG_FILE, { recursive: true });
+        await Deno.remove(CONFIG_FILE, { recursive: true })
       }
     } catch {
       // If file doesn't exist, that's fine
