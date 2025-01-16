@@ -9,7 +9,7 @@ export const config = {
   ),
   get CONFIG_FILE() {
     return join(this.CONFIG_DIR, 'secrets.json')
-  }
+  },
 }
 
 function parseArguments(args: string[]) {
@@ -55,7 +55,10 @@ async function saveApiKey(apiKey: string): Promise<void> {
       // If file doesn't exist, that's fine
     }
     const configData = { apiKey }
-    await Deno.writeTextFile(config.CONFIG_FILE, JSON.stringify(configData, null, 2))
+    await Deno.writeTextFile(
+      config.CONFIG_FILE,
+      JSON.stringify(configData, null, 2),
+    )
   } catch (error) {
     console.error('Failed to save API key:', error)
     throw error
