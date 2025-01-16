@@ -5,7 +5,7 @@
   "tasks": {
     "lint": "deno lint",
     "format": "deno fmt",
-    "dev": "deno run --allow-read --allow-write --allow-env --allow-net mod.ts"
+    "dev": "deno run --allow-read --allow-write --allow-env --allow-net mod.ts \"$@\""
   },
   "fmt": {
     "semiColons": false,

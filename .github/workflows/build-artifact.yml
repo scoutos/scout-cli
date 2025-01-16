@@ -1,0 +1,43 @@
+name: Build Artifact
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  # Optionally trigger on release
+#   release:
+#     types: [created]
+
+jobs:
+  build:
+    name: Build CLI Artifact
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            output: scout-cli-linux
+          - os: windows-latest
+            output: scout-cli-windows.exe
+          - os: macos-latest
+            output: scout-cli-macos
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Compile CLI
+        run: deno compile --allow-read --allow-write --allow-env --allow-net --output ${{ matrix.output }} mod.ts
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.output }}
+          path: ${{ matrix.output }}
