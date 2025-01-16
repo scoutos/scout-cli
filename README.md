@@ -20,7 +20,7 @@ cd scout-cli
 3. Now you should be able to run the code locally:
 
 ```bash
-deno task dev --get-workflow=workflow_id_1234
+deno task dev --get-workflow=workflow_id_123
 ```
 
 ### Using `scout-cli`
