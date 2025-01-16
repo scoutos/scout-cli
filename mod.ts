@@ -2,7 +2,10 @@ import { parseArgs } from 'https://deno.land/std@0.218.0/cli/parse_args.ts'
 import { join } from 'https://deno.land/std@0.218.0/path/mod.ts'
 import type { ParseOptions } from 'https://deno.land/std@0.218.0/cli/parse_args.ts'
 
-export const config = {
+export const config: {
+  CONFIG_DIR: string
+  CONFIG_FILE: string
+} = {
   CONFIG_DIR: join(
     Deno.env.get('HOME') || Deno.env.get('USERPROFILE') || '.',
     '.scout-cli',
