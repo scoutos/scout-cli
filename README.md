@@ -3,7 +3,7 @@
 `scout-cli` allows one to interact with and update Scout workflows via
 [CLI](https://en.wikipedia.org/wiki/Command-line_interface) commands.
 
-## Development
+## Local Development
 
 1. Clone and setup:
 
@@ -37,6 +37,20 @@ deno install --allow-read --allow-write --allow-env --allow-net -n scout-cli mod
 ```
 
 ### Using CLI
+
+1. Download the appropriate executable for your system from the [Build Artifact workflow](https://github.com/scoutos/scout-cli/actions/workflows/build-artifact.yml). For this example we will download the `scout-cli-macos` artifact.
+2. Unzip the file then run the following commands to make the executable available on your system:
+
+```bash
+# Give permissions to run on mac
+xattr -d com.apple.quarantine scout-cli-macos
+
+# Move & rename executable 
+sudo mv scout-cli-macos /usr/local/bin/scout-cli
+```
+
+3. Now you should be able to use `scout-cli` from your system!
+4. If you want to remove the cli you can run `sudo rm /usr/local/bin/scout-cli`.
 
 When you first use the cli tool, you will be asked to set your `apikey`. This should be the secret key found in "API Keys" section in the Scout dashboard settings panel. **Note**: You may have to grant the cli permissions to write, read, delete to your system. The api key will be stored in `~/.scout-cli/secrets.json`.
 
