@@ -33,6 +33,10 @@ Deno.test({
 
 Deno.test({
   name: 'CLI - Delete API key',
+  permissions: {
+    read: true,
+    write: true,
+  },
   async fn() {
     // Save original config values
     const originalConfigDir = config.CONFIG_DIR
