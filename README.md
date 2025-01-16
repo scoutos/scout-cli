@@ -38,6 +38,8 @@ deno install --allow-read --allow-write -n scout-cli src/main.ts --global -f
 
 ### Using CLI
 
+When you first use the cli tool, you will be asked to set your `apikey`. This should be the secret key found in "API Keys" section in the Scout dashboard settings panel. **Note**: You may have to grant the cli permissions to write, read, delete to your system. The api key will be stored in `~/.scout-cli/secrets.json`.
+
 Example command:
 
 ```bash

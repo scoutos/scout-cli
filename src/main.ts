@@ -1,7 +1,14 @@
 #!/usr/bin/env -S deno run --allow-read --allow-write
 
 import { parseArgs } from 'https://deno.land/std@0.218.0/cli/parse_args.ts'
+import { join } from 'https://deno.land/std@0.218.0/path/mod.ts'
 import type { ParseOptions } from 'https://deno.land/std@0.218.0/cli/parse_args.ts'
+
+const CONFIG_DIR = join(
+  Deno.env.get('HOME') || Deno.env.get('USERPROFILE') || '.',
+  '.scout-cli',
+)
+const CONFIG_FILE = join(CONFIG_DIR, 'secrets.json')
 
 function parseArguments(args: string[]) {
   const config: ParseOptions = {
@@ -11,8 +18,8 @@ function parseArguments(args: string[]) {
       'n': 'name',
       'c': 'color',
     },
-    boolean: ['help', 'save'],
-    string: ['name', 'color'],
+    boolean: ['help', 'save', 'delete-apikey'],
+    string: ['name', 'color', 'apikey'],
   }
 
   return parseArgs(args, config)
@@ -25,9 +32,41 @@ function printHelp(): void {
   console.log('  -s, --save                Save settings for future greetings')
   console.log('  -n, --name                Set your name for the greeting')
   console.log('  -c, --color               Set the color of the greeting')
+  console.log('  -k, --apikey              Set your API key for authentication')
+  console.log('  -d, --delete-apikey       Delete your API key')
 }
 
-function main(inputArgs: string[]) {
+async function getStoredApiKey(): Promise<string | null> {
+  try {
+    const config = await Deno.readTextFile(CONFIG_FILE)
+    return JSON.parse(config).apiKey || null
+  } catch {
+    return null
+  }
+}
+
+async function saveApiKey(apiKey: string): Promise<void> {
+  try {
+    // Ensure config directory exists
+    await Deno.mkdir(CONFIG_DIR, { recursive: true })
+    const config = { apiKey }
+    await Deno.writeTextFile(CONFIG_FILE, JSON.stringify(config, null, 2))
+  } catch (error) {
+    console.error('Failed to save API key:', error)
+    throw error
+  }
+}
+
+async function deleteApiKey(): Promise<void> {
+  try {
+    await Deno.remove(CONFIG_FILE)
+    console.log('API key deleted successfully')
+  } catch {
+    console.log('No stored API key found')
+  }
+}
+
+async function main(inputArgs: string[]) {
   const greetings = [
     'Hello',
     'Hi',
@@ -41,6 +80,24 @@ function main(inputArgs: string[]) {
   if (args.help) {
     printHelp()
     Deno.exit(0)
+  }
+
+  // Handle API key deletion
+  if (args['delete-apikey']) {
+    await deleteApiKey()
+    Deno.exit(0)
+  }
+
+  // Handle API key authentication
+  let apiKey = args.apikey || await getStoredApiKey()
+  if (!apiKey) {
+    console.log('Please enter your API key:')
+    apiKey = prompt('API Key:')
+    if (!apiKey) {
+      console.error('API key is required')
+      Deno.exit(1)
+    }
+    await saveApiKey(apiKey)
   }
 
   let name: string | null = args.name
