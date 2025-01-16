@@ -1,5 +1,3 @@
-#!/usr/bin/env -S deno run --allow-read --allow-write --allow-env
-
 import { parseArgs } from 'https://deno.land/std@0.218.0/cli/parse_args.ts'
 import { join } from 'https://deno.land/std@0.218.0/path/mod.ts'
 import type { ParseOptions } from 'https://deno.land/std@0.218.0/cli/parse_args.ts'
@@ -41,7 +39,6 @@ async function getStoredApiKey(): Promise<string | null> {
 
 async function saveApiKey(apiKey: string): Promise<void> {
   try {
-    // Ensure config directory exists
     await Deno.mkdir(CONFIG_DIR, { recursive: true })
     const config = { apiKey }
     await Deno.writeTextFile(CONFIG_FILE, JSON.stringify(config, null, 2))
@@ -83,7 +80,7 @@ async function getWorkflow(workflowId: string, apiKey: string): Promise<void> {
   }
 }
 
-async function main(inputArgs: string[]) {
+export async function scoutCli(inputArgs: string[]) {
   const args = parseArguments(inputArgs)
 
   if (args.help) {
@@ -118,4 +115,7 @@ async function main(inputArgs: string[]) {
   printHelp()
 }
 
-main(Deno.args)
+// Run main function if this module is being run directly
+if (import.meta.main) {
+  scoutCli(Deno.args)
+}
