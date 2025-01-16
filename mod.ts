@@ -40,6 +40,16 @@ async function getStoredApiKey(): Promise<string | null> {
 async function saveApiKey(apiKey: string): Promise<void> {
   try {
     await Deno.mkdir(CONFIG_DIR, { recursive: true })
+    // Check if secrets.json exists and is a directory
+    try {
+      const fileInfo = await Deno.stat(CONFIG_FILE)
+      if (fileInfo.isDirectory) {
+        // Remove the directory if it exists
+        await Deno.remove(CONFIG_FILE, { recursive: true })
+      }
+    } catch {
+      // If file doesn't exist, that's fine
+    }
     const config = { apiKey }
     await Deno.writeTextFile(CONFIG_FILE, JSON.stringify(config, null, 2))
   } catch (error) {
