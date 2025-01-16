@@ -19,11 +19,11 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
         include:
           - os: ubuntu-latest
-            output: cli-linux
+            output: scout-cli-linux
           - os: windows-latest
-            output: cli-windows.exe
+            output: scout-cli-windows.exe
           - os: macos-latest
-            output: cli-macos
+            output: scout-cli-macos
 
     steps:
       - uses: actions/checkout@v4
