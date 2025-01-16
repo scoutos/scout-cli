@@ -41,3 +41,23 @@ jobs:
         with:
           name: ${{ matrix.output }}
           path: ${{ matrix.output }}
+
+      # Only run release steps on push to main
+      - name: Create Release
+        # if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: github.event_name == 'pull_request'
+        uses: softprops/action-gh-release@v2
+        with:
+          name: PR #${{ github.event.pull_request.number }} Build
+          tag_name: pr-${{ github.event.pull_request.number }}
+          files: ${{ matrix.output }}
+          prerelease: true
+          generate_release_notes: true
+          body: |
+            Test build for PR #${{ github.event.pull_request.number }}
+            ${{ github.event.pull_request.html_url }}
+          # name: Latest Build
+          # tag_name: latest
+          # files: ${{ matrix.output }}
+          # prerelease: true
+          # generate_release_notes: true
