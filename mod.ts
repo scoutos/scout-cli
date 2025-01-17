@@ -20,7 +20,7 @@ function parseArguments(args: string[]) {
     alias: {
       'h': 'help',
     },
-    boolean: ['help', 'delete-apikey'],
+    boolean: ['help', 'delete-apikey', 'show-apikey'],
     string: ['apikey', 'get-workflow'],
   }
 
@@ -32,6 +32,7 @@ function printHelp(): void {
   console.log('  -h, --help                Display this help and exit')
   console.log('  -k, --apikey              Set your API key for authentication')
   console.log('  -d, --delete-apikey       Delete your API key')
+  console.log('      --show-apikey         Display current API key')
   console.log('      --get-workflow        Get workflow by ID')
 }
 
@@ -115,8 +116,19 @@ export async function scoutCli(inputArgs: string[]) {
     Deno.exit(0)
   }
 
-  // Handle API key authentication
+  // Handle API key operations
   let apiKey = args.apikey || await getStoredApiKey()
+
+  // Show API key if requested
+  if (args['show-apikey']) {
+    if (apiKey) {
+      console.log(`Current API key: ${apiKey}`)
+    } else {
+      console.log('No API key currently stored')
+    }
+    Deno.exit(0)
+  }
+
   if (!apiKey) {
     console.log('Please enter your API key:')
     apiKey = prompt('API Key:')

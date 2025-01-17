@@ -20,7 +20,7 @@ Deno.test({
       // Ignore exit calls
     }
 
-    assertSpyCalls(consoleLogSpy, 5) // Help message has 5 lines
+    assertSpyCalls(consoleLogSpy, 6) // Help message has 6 lines
     assertEquals(
       consoleLogSpy.calls[0].args[0],
       '\nOptional flags:',
