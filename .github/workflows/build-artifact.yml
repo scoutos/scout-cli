@@ -96,14 +96,20 @@ jobs:
       - name: Prepare Artifacts
         run: |
           mkdir -p release_files
-          # Copy files from their nested locations
-          cp artifacts/scout-cli-linux/scout-cli-linux release_files/
-          cp artifacts/scout-cli-macos/scout-cli-macos release_files/
-          cp artifacts/scout-cli-windows.exe/scout-cli-windows.exe release_files/
-          echo "Release files contents:"
+          # Copy preserving mode, ownership, timestamps
+          cp -p artifacts/scout-cli-linux/scout-cli-linux release_files/
+          cp -p artifacts/scout-cli-macos/scout-cli-macos release_files/
+          cp -p artifacts/scout-cli-windows.exe/scout-cli-windows.exe release_files/
+          
+          # Explicitly set executable permissions
+          chmod +x release_files/scout-cli-linux
+          chmod +x release_files/scout-cli-macos
+          
+          echo "Release files contents and permissions:"
           ls -la release_files/
-          # Make executables actually executable
-          chmod +x release_files/*
+          
+          # Check file types
+          file release_files/*
 
       - name: Create PR Release
         if: github.event_name == 'pull_request'
