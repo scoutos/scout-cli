@@ -44,7 +44,7 @@ async function getStoredApiKey(): Promise<string | null> {
   }
 }
 
-async function saveApiKey(apiKey: string): Promise<void> {
+async function saveApiKey(apiKey: string | null): Promise<void> {
   try {
     await Deno.mkdir(config.CONFIG_DIR, { recursive: true })
     // Check if secrets.json exists and is a directory
@@ -70,10 +70,11 @@ async function saveApiKey(apiKey: string): Promise<void> {
 
 async function deleteApiKey(): Promise<void> {
   try {
-    await Deno.remove(config.CONFIG_FILE)
+    await saveApiKey(null)
     console.log('API key deleted successfully')
-  } catch {
-    console.log('No stored API key found')
+  } catch (error) {
+    console.error('Failed to delete API key:', error)
+    throw error
   }
 }
 
