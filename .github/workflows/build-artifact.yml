@@ -52,6 +52,15 @@ jobs:
         with:
           path: artifacts
 
+      # Delete previous PR release if it exists
+      - name: Delete previous PR release
+        if: github.event_name == 'pull_request'
+        uses: dev-drprasad/delete-tag-and-release@v1.0
+        with:
+          tag_name: pr-${{ github.event.pull_request.number }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          delete_release: true
+
       # Only run release steps on push to main
       - name: Create Release
         # if: github.event_name == 'push' && github.ref == 'refs/heads/main'
