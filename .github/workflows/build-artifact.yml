@@ -54,7 +54,7 @@ jobs:
         with:
           name: PR #${{ github.event.pull_request.number }} Build
           tag_name: pr-${{ github.event.pull_request.number }}
-          files: ${{ matrix.output }}
+          files: artifacts/**/*  # Upload all files in artifacts directory
           prerelease: true
           generate_release_notes: true
           body: |
