@@ -92,13 +92,18 @@ jobs:
           echo "Artifacts directory contents:"
           ls -R artifacts/
 
-      # Flatten the directory structure
+      # Modified flatten step to handle nested structure
       - name: Prepare Artifacts
         run: |
           mkdir -p release_files
-          find artifacts -type f -exec cp {} release_files/ \;
+          # Copy files from their nested locations
+          cp artifacts/scout-cli-linux/scout-cli-linux release_files/
+          cp artifacts/scout-cli-macos/scout-cli-macos release_files/
+          cp artifacts/scout-cli-windows.exe/scout-cli-windows.exe release_files/
           echo "Release files contents:"
           ls -la release_files/
+          # Make executables actually executable
+          chmod +x release_files/*
 
       - name: Create PR Release
         if: github.event_name == 'pull_request'
