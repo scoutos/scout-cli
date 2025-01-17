@@ -1,5 +1,9 @@
 name: Build Artifact
 
+permissions:
+  contents: write
+  pull-requests: write
+
 on:
   push:
     branches: [main]
@@ -41,3 +45,81 @@ jobs:
         with:
           name: ${{ matrix.output }}
           path: ${{ matrix.output }}
+
+  release:
+    name: Create Release
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Add this step to see what we're working with
+      - name: List Current Directory
+        run: ls -la
+
+      # Delete previous PR release if it exists
+      - name: Delete previous PR release
+        if: github.event_name == 'pull_request'
+        uses: dev-drprasad/delete-tag-and-release@v1.0
+        with:
+          tag_name: pr-${{ github.event.pull_request.number }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          delete_release: true
+
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      # Add detailed inspection
+      - name: Inspect Artifacts
+        run: |
+          echo "Full directory structure:"
+          find artifacts -type f -exec file {} \;
+          echo "\nFile sizes:"
+          find artifacts -type f -exec ls -lh {} \;
+          echo "\nDirectory tree:"
+          tree artifacts/
+
+      # Add this step to debug artifact contents
+      - name: Display structure of downloaded artifacts
+        run: |
+          echo "Artifacts directory contents:"
+          ls -R artifacts/
+
+      # Modified flatten step to handle nested structure
+      - name: Prepare Artifacts
+        run: |
+          mkdir -p release_files
+          # Copy preserving mode, ownership, timestamps
+          cp -p artifacts/scout-cli-linux/scout-cli-linux release_files/
+          cp -p artifacts/scout-cli-macos/scout-cli-macos release_files/
+          cp -p artifacts/scout-cli-windows.exe/scout-cli-windows.exe release_files/
+
+          # Explicitly set executable permissions
+          chmod +x release_files/scout-cli-linux
+          chmod +x release_files/scout-cli-macos
+
+          echo "Release files contents and permissions:"
+          ls -la release_files/
+
+          # Check file types
+          file release_files/*
+
+      - name: Create PR Release
+        if: github.event_name == 'pull_request'
+        uses: softprops/action-gh-release@v1
+        with:
+          name: PR #${{ github.event.pull_request.number }} Build
+          tag_name: pr-${{ github.event.pull_request.number }}
+          files: release_files/*
+          prerelease: true
+          generate_release_notes: true
+          body: |
+            Test build for PR #${{ github.event.pull_request.number }}
+            ${{ github.event.pull_request.html_url }}
