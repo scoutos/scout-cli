@@ -46,11 +46,21 @@ jobs:
           name: ${{ matrix.output }}
           path: ${{ matrix.output }}
 
-      # Download all artifacts
-      - name: Download Artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: artifacts
+  release:
+    name: Create Release
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Add this step to see what we're working with
+      - name: List Current Directory
+        run: ls -la
 
       # Delete previous PR release if it exists
       - name: Delete previous PR release
@@ -61,22 +71,26 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           delete_release: true
 
-      # Only run release steps on push to main
-      - name: Create Release
-        # if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      # Add this step to debug artifact contents
+      - name: Display structure of downloaded artifacts
+        run: |
+          echo "Artifacts directory contents:"
+          ls -R artifacts/
+
+      - name: Create PR Release
         if: github.event_name == 'pull_request'
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v1
         with:
           name: PR #${{ github.event.pull_request.number }} Build
           tag_name: pr-${{ github.event.pull_request.number }}
-          files: artifacts/**/* # Upload all files in artifacts directory
+          files: artifacts/**/*
           prerelease: true
           generate_release_notes: true
           body: |
             Test build for PR #${{ github.event.pull_request.number }}
             ${{ github.event.pull_request.html_url }}
-          # name: Latest Build
-          # tag_name: latest
-          # files: ${{ matrix.output }}
-          # prerelease: true
-          # generate_release_notes: true
