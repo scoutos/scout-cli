@@ -100,14 +100,14 @@ jobs:
           cp -p artifacts/scout-cli-linux/scout-cli-linux release_files/
           cp -p artifacts/scout-cli-macos/scout-cli-macos release_files/
           cp -p artifacts/scout-cli-windows.exe/scout-cli-windows.exe release_files/
-          
+
           # Explicitly set executable permissions
           chmod +x release_files/scout-cli-linux
           chmod +x release_files/scout-cli-macos
-          
+
           echo "Release files contents and permissions:"
           ls -la release_files/
-          
+
           # Check file types
           file release_files/*
 
