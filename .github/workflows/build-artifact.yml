@@ -82,13 +82,21 @@ jobs:
           echo "Artifacts directory contents:"
           ls -R artifacts/
 
+      # Flatten the directory structure
+      - name: Prepare Artifacts
+        run: |
+          mkdir -p release_files
+          find artifacts -type f -exec cp {} release_files/ \;
+          echo "Release files contents:"
+          ls -la release_files/
+
       - name: Create PR Release
         if: github.event_name == 'pull_request'
         uses: softprops/action-gh-release@v1
         with:
           name: PR #${{ github.event.pull_request.number }} Build
           tag_name: pr-${{ github.event.pull_request.number }}
-          files: artifacts/**/*
+          files: release_files/*
           prerelease: true
           generate_release_notes: true
           body: |
