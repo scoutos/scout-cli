@@ -76,6 +76,16 @@ jobs:
         with:
           path: artifacts
 
+      # Add detailed inspection
+      - name: Inspect Artifacts
+        run: |
+          echo "Full directory structure:"
+          find artifacts -type f -exec file {} \;
+          echo "\nFile sizes:"
+          find artifacts -type f -exec ls -lh {} \;
+          echo "\nDirectory tree:"
+          tree artifacts/
+
       # Add this step to debug artifact contents
       - name: Display structure of downloaded artifacts
         run: |
