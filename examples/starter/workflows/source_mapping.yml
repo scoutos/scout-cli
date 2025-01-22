@@ -1,0 +1,39 @@
+workflow_key: hahaha
+workflow_config:
+  workflow_display_name: wowowza!!!
+  workflow_schema_version: "1.0"
+  workflow_img_url: "https://ghexww3n55fveb5i.public.blob.vercel-storage.com/clock-rewind-tpl82PR0UFBWnD75jzlllaGm9sIB4M.svg"
+  workflow_description: null
+
+  blocks:
+    - block_archetype_id: com.scoutos.input
+      block_display_name: "Town to Search?"
+      block_id: inputs
+      block_inputs:
+        items:
+          - display_name: User Message
+            key: user_message
+            is_optional: false
+            input_type: short_text
+
+    - block_archetype_id: com.scoutos.llm
+      block_display_name: LLM
+      block_id: block_a1mk1a
+      block_inputs:
+        model: gpt-4o
+        response_format: text
+        max_tokens: 300
+        temperature: 0.7
+        prompt_items:
+          - role: user
+            content: "Hello, I have a question about my science project."
+          - role: assistant
+            content: "Sure, I'm an expert scientist. How can I assist you with your project?"
+          - role: user
+            content: "I'm trying to understand how photosynthesis works. Can you explain it to me?"
+          - role: assistant
+            content: "Of course! Photosynthesis is the process by which green plants and some other organisms use sunlight to synthesize foods with the help of chlorophyll. It involves the conversion of carbon dioxide and water into glucose and oxygen."
+          - role: user
+            content: "{{inputs.user_message}}"
+      dependencies:
+        - block_id: inputs
