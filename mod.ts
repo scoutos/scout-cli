@@ -13,6 +13,8 @@ import {
 } from "https://deno.land/std@0.218.0/fmt/colors.ts";
 import { expandGlob } from "https://deno.land/std@0.218.0/fs/mod.ts";
 
+const BASE_URL = "https://api.scoutos.com";
+
 export const config: {
   CONFIG_DIR: string;
   CONFIG_FILE: string;
@@ -84,50 +86,6 @@ function highlightJson(json: string): string {
   );
 }
 
-async function executeWorkflow(
-  workflowId: string,
-  inputs: string,
-  apiKey: string,
-  outputPath?: string // Add optional outputPath parameter
-): Promise<void> {
-  try {
-    console.log(bold(green("Executing workflow...")));
-    console.log(bold("Workflow ID:"), workflowId);
-    console.log(bold("Inputs:"), inputs);
-
-    // log the type of inputs
-    console.log(bold("Type of inputs:"), typeof inputs);
-    const parsedInputs = JSON.parse(await getInputs(inputs));
-    const response = await fetch(
-      `https://api-prod.scoutos.com/v2/workflows/${workflowId}/execute`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ inputs: parsedInputs }),
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const result = await response.json();
-    console.log(bold(green("Workflow executed successfully:")));
-    console.log(highlightJson(JSON.stringify(result, null, 2)));
-
-    if (outputPath) {
-      await Deno.writeTextFile(outputPath, JSON.stringify(result, null, 2));
-      console.log(bold(green(`Workflow result written to ${outputPath}`)));
-    }
-  } catch (error) {
-    console.error(bold(red("Failed to execute workflow:")), error);
-    Deno.exit(1);
-  }
-}
-
 async function executeEphemeralWorkflow(
   workflowId: string,
   inputs: string,
@@ -154,7 +112,7 @@ async function executeEphemeralWorkflow(
 
       console.log(bold("body"), body);
 
-      const response = await fetch(`http://0.0.0.0:8000/v2/workflows/execute`, {
+      const response = await fetch(`${BASE_URL}/v2/workflows/execute`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${apiKey}`,
@@ -186,57 +144,15 @@ async function executeEphemeralWorkflow(
   }
 }
 
-async function getWorkflow(
-  workflowId: string,
-  apiKey: string,
-  outputPath?: string
-): Promise<void> {
-  try {
-    console.log(bold(green("Getting workflow...")));
-    console.log(bold("Workflow ID:"), workflowId);
-
-    const response = await fetch(
-      `https://api-prod.scoutos.com/v2/workflows/${workflowId}`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const result = await response.json();
-    console.log(bold(green("Workflow fetched successfully:")));
-    console.log(highlightJson(JSON.stringify(result, null, 2)));
-
-    if (outputPath) {
-      const yamlString = json2yaml(JSON.stringify(result.data.workflow_config));
-
-      await Deno.writeTextFile(outputPath, yamlString);
-      console.log(bold(green(`Workflow data written to ${outputPath}`)));
-    }
-  } catch (error) {
-    console.error(bold(red("Failed to get workflow:")), error);
-    Deno.exit(1);
-  }
-}
-
 async function deployWorkflow(
   configPath: string,
   apiKey: string
 ): Promise<void> {
   try {
     console.log(bold(green("Deploying workflow...")));
-    console.log(bold("Config Path:"), configPath);
 
     const configData = await Deno.readTextFile(configPath);
-    // console.log("configData", configData);
-    const configJson = parse(configData);
+
     const workflowConfig = configJson.workflow_config;
     const workflowKey = configJson.workflow_key;
 
@@ -250,7 +166,7 @@ async function deployWorkflow(
     }
 
     const response = await fetch(
-      `http://0.0.0.0:8000/v2/workflows?workflow_key=${workflowKey}`,
+      `${BASE_URL}/v2/workflows?workflow_key=${workflowKey}`,
       {
         method: "POST",
         headers: {
@@ -261,11 +177,14 @@ async function deployWorkflow(
       }
     );
 
+    console.log(bold("Response status:"), response.status);
+    console.log(bold("Response status text:"), response.statusText);
+
     if (!response.ok) {
       if (response.status === 409) {
         console.log(bold(yellow("Workflow Exists, Creating New Revision...")));
         const response = await fetch(
-          `http://0.0.0.0:8000/v2/workflows/revisions?workflow_key=${workflowKey}`,
+          `${BASE_URL}/v2/workflows/revisions?workflow_key=${workflowKey}`,
           {
             method: "POST",
             headers: {
@@ -277,13 +196,13 @@ async function deployWorkflow(
         );
 
         if (!response.ok) {
+          console.log(bold(red("Error response body:")), await response.text());
           throw new Error(`HTTP error! status: ${response.status}`);
         }
 
         const result = await response.json();
 
         const workflowId = result.data.workflow_id;
-
         const urlToWorkflow = `https://studio.scoutos.com/workflows/${workflowId}`;
 
         console.log(
@@ -296,6 +215,7 @@ async function deployWorkflow(
       }
     } else {
       const result = await response.json();
+
       const workflowId = result.data.workflow_id;
       const urlToWorkflow = `https://studio.scoutos.com/workflows/${workflowId}`;
       console.log(
