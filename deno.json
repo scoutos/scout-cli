@@ -25,6 +25,5 @@
     "write": ["$HOME/.scout-cli"],
     "env": ["HOME", "USERPROFILE"],
     "net": true
-  },
-  "nodeModulesDir": "auto"
+  }
 }
