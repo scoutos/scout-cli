@@ -1,7 +1,7 @@
 import { Command } from "https://deno.land/x/cliffy@v0.25.7/command/mod.ts";
 import { join } from "https://deno.land/std@0.218.0/path/mod.ts";
-import scoutos from "npm:scoutos@0.7.1";
-import { json2yaml } from "https://deno.land/x/json2yaml/mod.ts";
+// import scoutos from "npm:scoutos@0.7.1";
+// import { json2yaml } from "https://deno.land/x/json2yaml/mod.ts";
 import { parse } from "jsr:@std/yaml";
 import {
   green,
@@ -9,7 +9,6 @@ import {
   red,
   cyan,
   bold,
-  underline,
 } from "https://deno.land/std@0.218.0/fmt/colors.ts";
 import { expandGlob } from "https://deno.land/std@0.218.0/fs/mod.ts";
 
@@ -51,7 +50,7 @@ async function saveApiKey(apiKey: string | null): Promise<void> {
   }
 }
 
-async function getInputs(inputs: string): Promise<string> {
+async function _getInputs(inputs: string): Promise<string> {
   if (inputs.startsWith("@")) {
     const filePath = inputs.slice(1);
     try {
@@ -65,7 +64,7 @@ async function getInputs(inputs: string): Promise<string> {
   return inputs;
 }
 
-function highlightJson(json: string): string {
+function _highlightJson(json: string): string {
   return json.replace(
     /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:\s*)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,
     (match) => {
@@ -96,7 +95,6 @@ async function executeEphemeralWorkflow(
   try {
     console.log(bold(green("Executing workflow...")));
     console.log(bold("Workflow ID:"), workflowId);
-
     for await (const file of expandGlob(config)) {
       console.log(bold("Config file:"), file.path);
 
@@ -105,8 +103,10 @@ async function executeEphemeralWorkflow(
 
       console.log(bold("configJson"), configJson);
 
+      // inputs is a file path, read the file and parse it as json
+      const inputsJson = await Deno.readTextFile(inputs);
       const body = JSON.stringify({
-        inputs: JSON.parse(inputs),
+        inputs: JSON.parse(inputsJson),
         workflow_config: configJson,
       });
 
@@ -144,6 +144,11 @@ async function executeEphemeralWorkflow(
   }
 }
 
+interface WorkflowConfig {
+  workflow_config: JSON;
+  workflow_key?: string;
+}
+
 async function deployWorkflow(
   configPath: string,
   apiKey: string
@@ -152,11 +157,11 @@ async function deployWorkflow(
     console.log(bold(green("Deploying workflow...")));
 
     const configData = await Deno.readTextFile(configPath);
+    const parsedConfig = parse(configData) as WorkflowConfig;
+    const workflowConfig = parsedConfig.workflow_config;
+    const workflowKey = parsedConfig.workflow_key;
 
-    const workflowConfig = configJson.workflow_config;
-    const workflowKey = configJson.workflow_key;
-
-    if (!configJson) {
+    if (!parsedConfig) {
       console.error("Error: Invalid config file.");
       Deno.exit(1);
     }
@@ -252,6 +257,18 @@ const runCommand = new Command()
       }
       await saveApiKey(apiKey);
     }
+    if (!inputs) {
+      console.error(bold(red("Inputs are required")));
+      Deno.exit(1);
+    }
+    if (!config) {
+      console.error(bold(red("Config is required")));
+      Deno.exit(1);
+    }
+    if (!workflowId) {
+      console.error(bold(red("Workflow ID is required")));
+      Deno.exit(1);
+    }
     await executeEphemeralWorkflow(workflowId, inputs, apiKey, config, output);
   });
 
@@ -270,7 +287,9 @@ const getCommand = new Command()
       }
       await saveApiKey(apiKey);
     }
-    await getWorkflow(workflowId, apiKey, output);
+    console.log('Out and workflowId', output, workflowId)
+    // TODO: Implement getWorkflow (where does it go? saved as yaml file locally?)
+    // await getWorkflow(workflowId, apiKey, output);
   });
 
 const deployCommand = new Command()
@@ -287,6 +306,10 @@ const deployCommand = new Command()
       }
       await saveApiKey(apiKey);
     }
+    if (!config) {
+      console.error(bold(red("Config is required")));
+      Deno.exit(1);
+    }
     await deployWorkflow(config, apiKey);
   });
 
@@ -298,7 +321,7 @@ const workflowsCommand = new Command()
 
 await new Command()
   .name("scout")
-  .version("0.1.0")
+  .version("0.1.1")
   .description("Scout CLI tool")
   .command("workflows", workflowsCommand) // This line registers the workflowsCommand
   .parse(Deno.args);

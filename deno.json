@@ -1,10 +1,11 @@
 {
   "name": "scout-cli",
-  "version": "0.0.0",
+  "version": "0.1.1",
   "exports": "./mod.ts",
   "tasks": {
     "lint": "deno lint",
     "format": "deno fmt",
+    "build": "deno compile --allow-read --allow-write --allow-env --allow-net --output scout-cli-macos mod.ts",
     "dev": "deno run --allow-read --allow-write --allow-env --allow-net mod.ts",
     "test": "deno test --allow-read --allow-write --allow-env --allow-net mod_test.ts",
     "test:watch": "deno test --allow-read --allow-write --allow-env --allow-net --watch mod_test.ts",
@@ -24,5 +25,6 @@
     "write": ["$HOME/.scout-cli"],
     "env": ["HOME", "USERPROFILE"],
     "net": true
-  }
+  },
+  "nodeModulesDir": "auto"
 }
