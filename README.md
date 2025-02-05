@@ -114,5 +114,5 @@ Should output:
 Testing the cli locally:
 
 ```bash
-deno task dev workflows deploy --config ./examples/starter/workflows/source_mapping.yml
+deno run dev workflows deploy --config ./examples/starter/workflows/source_mapping.yml
 ```
