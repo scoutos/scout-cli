@@ -33,6 +33,19 @@ jobs:
         with:
           deno-version: v2.x
 
+      - name: (New) Cache Deno dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/deno
+            ~/.deno
+          key: ${{ runner.os }}-deno-${{ hashFiles('**/deps.ts', '**/mod.ts') }}
+          restore-keys: |
+            ${{ runner.os }}-deno-
+
+      - name: (New) Download dependencies
+        run: deno cache mod.ts
+
       - name: Compile CLI
         run: deno compile --allow-read --allow-write --allow-env --allow-net --output ${{ matrix.output }} mod.ts
 
