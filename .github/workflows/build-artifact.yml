@@ -55,28 +55,28 @@ jobs:
           name: ${{ matrix.output }}
           path: ${{ matrix.output }}
 
-    release:
-      name: Release Artifact
-      needs: build
-      runs-on: ubuntu-latest
-      uses: actions/create-release@v4
-      # if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-      steps:
-        - name: Download all artifacts
-          uses: actions/download-artifact@v4
-          with:
-            path: artifacts
+  release:
+    name: Release Artifact
+    needs: build
+    runs-on: ubuntu-latest
+    uses: actions/create-release@v4
+    # if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
 
-        - name: Create Release
-          uses: softprops/action-gh-release@v1
-          with:
-            name: Release ${{ github.sha }}
-            tag_name: release-${{ github.sha }}
-            files: |
-              artifacts/scout-cli-linux/scout-cli-linux
-              artifacts/scout-cli-windows.exe/scout-cli-windows.exe
-              artifacts/scout-cli-macos/scout-cli-macos
-            draft: false
-            prerelease: false
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: Release ${{ github.sha }}
+          tag_name: release-${{ github.sha }}
+          files: |
+            artifacts/scout-cli-linux/scout-cli-linux
+            artifacts/scout-cli-windows.exe/scout-cli-windows.exe
+            artifacts/scout-cli-macos/scout-cli-macos
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
