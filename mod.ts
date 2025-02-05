@@ -1,3 +1,6 @@
+// deno-lint-ignore-file
+// @ts-ignore no-slow-types
+
 import { Command } from 'https://deno.land/x/cliffy@v0.25.7/command/mod.ts'
 import { join } from 'https://deno.land/std@0.218.0/path/mod.ts'
 // import scoutos from "npm:scoutos@0.7.1";
@@ -26,6 +29,8 @@ export const config: {
     return join(this.CONFIG_DIR, 'secrets.json')
   },
 }
+
+type CommandType = Command<any, any, any, any, any, any, any, any>
 
 async function getStoredApiKey(): Promise<string | null> {
   try {
@@ -238,7 +243,7 @@ async function deployWorkflow(
   }
 }
 
-const runCommand = new Command()
+const runCommand: CommandType = new Command()
   .description('Run a workflow')
   .arguments('<workflow_id:string>')
   .option(
@@ -273,7 +278,7 @@ const runCommand = new Command()
     await executeEphemeralWorkflow(workflowId, inputs, apiKey, config, output)
   })
 
-const getCommand = new Command()
+const getCommand: CommandType = new Command()
   .description('Get a workflow')
   .arguments('<workflow_id:string>')
   .option('-o, --output <output:string>', 'Path to save the output')
@@ -293,7 +298,7 @@ const getCommand = new Command()
     // await getWorkflow(workflowId, apiKey, output);
   })
 
-const deployCommand = new Command()
+const deployCommand: CommandType = new Command()
   .description('Deploy a workflow')
   .option('-c, --config <config:string>', 'Path to the config file')
   .action(async ({ config }) => {
@@ -314,13 +319,15 @@ const deployCommand = new Command()
     await deployWorkflow(config, apiKey)
   })
 
-const workflowsCommand = new Command()
+
+const workflowsCommand: CommandType = new Command()
   .description('Manage workflows')
   .command('run', runCommand)
   .command('deploy', deployCommand)
   .command('get', getCommand)
 
-export const scoutCli = new Command()
+
+export const scoutCli: CommandType = new Command()
   .name('scout')
   .version('0.1.1')
   .description('Scout CLI tool')
