@@ -319,13 +319,11 @@ const deployCommand: CommandType = new Command()
     await deployWorkflow(config, apiKey)
   })
 
-
 const workflowsCommand: CommandType = new Command()
   .description('Manage workflows')
   .command('run', runCommand)
   .command('deploy', deployCommand)
   .command('get', getCommand)
-
 
 export const scoutCli: CommandType = new Command()
   .name('scout')
