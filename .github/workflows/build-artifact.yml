@@ -50,15 +50,23 @@ jobs:
             ./temp
           key: ${{ runner.os }}-deno-${{ hashFiles('**/deps.ts', '**/mod.ts') }}
 
+      - name: Install npm dependencies
+        run: |
+          deno cache --reload npm:abort-controller@3.0.0
+          deno cache --reload npm:scoutos@0.7.1
+        env:
+          DENO_DIR: ./temp/deno-dir
+
       - name: Download dependencies
         run: deno cache mod.ts
         env:
           DENO_DIR: ./temp/deno-dir
 
       - name: Compile CLI
-        run: deno compile --allow-read --allow-write --allow-env --allow-net --output ${{ matrix.output }} mod.ts
+        run: deno compile --allow-read --allow-write --allow-env --allow-net --allow-run --output ${{ matrix.output }} mod.ts
         env:
-          DENO_DIR: ./deno-cache  # Use a directory in the workspace
+          DENO_DIR: ./temp/deno-cache  # Use a directory in the workspace
+          TMPDIR: ./temp
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
