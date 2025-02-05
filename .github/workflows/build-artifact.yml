@@ -36,6 +36,13 @@ jobs:
         with:
           deno-version: v2.x
 
+      - name: Install npm dependencies
+        run: |
+          deno cache --reload npm:abort-controller@3.0.0
+          deno cache --reload npm:scoutos@0.7.1
+        env:
+          DENO_DIR: ./temp/deno-dir
+
       - name: Download dependencies
         run: deno cache mod.ts
         env:
@@ -45,6 +52,7 @@ jobs:
         run: deno compile --allow-read --allow-write --allow-env --allow-net --allow-run --output ${{ matrix.output }} mod.ts
         env:
           DENO_DIR: ./temp/deno-dir
+          TMPDIR: ./temp
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
