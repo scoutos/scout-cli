@@ -36,8 +36,15 @@ jobs:
         with:
           deno-version: v2.x
 
+      - name: Download dependencies
+        run: deno cache mod.ts
+        env:
+          DENO_DIR: ./temp/deno-dir
+
       - name: Compile CLI
         run: deno compile --allow-read --allow-write --allow-env --allow-net --allow-run --output ${{ matrix.output }} mod.ts
+        env:
+          DENO_DIR: ./temp/deno-dir
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
