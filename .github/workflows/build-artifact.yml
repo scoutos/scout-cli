@@ -36,6 +36,25 @@ jobs:
         with:
           deno-version: v2.x
 
+      - name: Create temp directory
+        run: |
+          mkdir -p ./temp
+          chmod 777 ./temp
+
+      - name: Cache Deno dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/deno
+            ~/.deno
+            ./temp
+          key: ${{ runner.os }}-deno-${{ hashFiles('**/deps.ts', '**/mod.ts') }}
+
+      - name: Download dependencies
+        run: deno cache mod.ts
+        env:
+          DENO_DIR: ./temp/deno-dir
+
       - name: Compile CLI
         run: deno compile --allow-read --allow-write --allow-env --allow-net --output ${{ matrix.output }} mod.ts
         env:
