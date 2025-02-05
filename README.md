@@ -20,23 +20,27 @@ cd scout-cli
 3. Now you should be able to run the code locally:
 
 ```bash
-deno task dev --get-workflow=workflow_id_123
+deno task dev workflows get workflow_id_123
 ```
 
 ### Using `scout-cli`
 
-1. Download the appropriate executable for your system from the [Build Artifact workflow](https://github.com/scoutos/scout-cli/actions/workflows/build-artifact.yml). For this example we will download the `scout-cli-macos` artifact.
+1. (Update or Delete this line) Download the appropriate executable for your system from the [Build Artifact workflow](https://github.com/scoutos/scout-cli/actions/workflows/build-artifact.yml). For this example we will download the `scout-cli-macos` artifact.
+
+- The above link takes you to a github action workflow which does not give you a place to install any zip file. This page is the build-artifact.yml that defines the github workflow. Without knowing how to run the yaml file, I just manually ran the following:
+- `deno compile --allow-read --allow-write --allow-env --allow-net --output scout-cli-macos mod.ts` or just run `deno run build` if your on mac
+
 2. Unzip the file then run the following commands to make the executable available on your system:
 
 ```bash
-# Give permissions to run on mac
+# Give permissions to run on mac (TODO: fix this if necessary, current error: xattr: scout-cli-macos: No such xattr: com.apple.quarantine)
 xattr -d com.apple.quarantine scout-cli-macos
 
 # Move & rename executable 
 sudo mv scout-cli-macos /usr/local/bin/scout-cli
 ```
 
-3. Now you should be able to use `scout-cli` from your system!
+3. Now you should be able to use `scout-cli` from your system! Trying running `scout-cli --help` to see if it works.
 4. If you want to remove the cli you can run `sudo rm /usr/local/bin/scout-cli`.
 
 When you first use the cli tool, you will be asked to set your `apikey`. This should be the secret key found in "API Keys" section in the Scout dashboard settings panel. **Note**: You may have to grant the cli permissions to write, read, delete to your system. The api key will be stored in `~/.scout-cli/secrets.json`.
@@ -44,7 +48,7 @@ When you first use the cli tool, you will be asked to set your `apikey`. This sh
 Example command:
 
 ```bash
-scout-cli --get-workflow=workflow_id_123
+scout-cli workflows get workflow_id_123
 ```
 
 Should output:
@@ -107,4 +111,10 @@ Should output:
     "is_draft": true
   }
 }
+```
+
+Testing the cli locally:
+
+```bash
+deno run dev workflows deploy --config ./examples/starter/workflows/source_mapping.yml
 ```

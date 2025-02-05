@@ -1,89 +1,93 @@
-import { Command } from "https://deno.land/x/cliffy@v0.25.7/command/mod.ts";
-import { join } from "https://deno.land/std@0.218.0/path/mod.ts";
-import scoutos from "npm:scoutos@0.7.1";
-import { json2yaml } from "https://deno.land/x/json2yaml/mod.ts";
-import { parse } from "jsr:@std/yaml";
-import {
-  green,
-  yellow,
-  red,
-  cyan,
-  bold,
-  underline,
-} from "https://deno.land/std@0.218.0/fmt/colors.ts";
-import { expandGlob } from "https://deno.land/std@0.218.0/fs/mod.ts";
+// deno-lint-ignore-file
+// @ts-ignore no-slow-types
 
-const BASE_URL = "https://api.scoutos.com";
+import { Command } from 'https://deno.land/x/cliffy@v0.25.7/command/mod.ts'
+import { join } from 'https://deno.land/std@0.218.0/path/mod.ts'
+// import scoutos from "npm:scoutos@0.7.1";
+// import { json2yaml } from "https://deno.land/x/json2yaml/mod.ts";
+import { parse } from 'jsr:@std/yaml'
+import {
+  bold,
+  cyan,
+  green,
+  red,
+  yellow,
+} from 'https://deno.land/std@0.218.0/fmt/colors.ts'
+import { expandGlob } from 'https://deno.land/std@0.218.0/fs/mod.ts'
+
+const BASE_URL = 'https://api.scoutos.com'
 
 export const config: {
-  CONFIG_DIR: string;
-  CONFIG_FILE: string;
+  CONFIG_DIR: string
+  CONFIG_FILE: string
 } = {
   CONFIG_DIR: join(
-    Deno.env.get("HOME") || Deno.env.get("USERPROFILE") || ".",
-    ".scout-cli"
+    Deno.env.get('HOME') || Deno.env.get('USERPROFILE') || '.',
+    '.scout-cli',
   ),
   get CONFIG_FILE() {
-    return join(this.CONFIG_DIR, "secrets.json");
+    return join(this.CONFIG_DIR, 'secrets.json')
   },
-};
+}
+
+type CommandType = Command<any, any, any, any, any, any, any, any>
 
 async function getStoredApiKey(): Promise<string | null> {
   try {
-    const configData = await Deno.readTextFile(config.CONFIG_FILE);
-    return JSON.parse(configData).apiKey || null;
+    const configData = await Deno.readTextFile(config.CONFIG_FILE)
+    return JSON.parse(configData).apiKey || null
   } catch {
-    return null;
+    return null
   }
 }
 
 async function saveApiKey(apiKey: string | null): Promise<void> {
   try {
-    await Deno.mkdir(config.CONFIG_DIR, { recursive: true });
-    const configData = { apiKey };
+    await Deno.mkdir(config.CONFIG_DIR, { recursive: true })
+    const configData = { apiKey }
     await Deno.writeTextFile(
       config.CONFIG_FILE,
-      JSON.stringify(configData, null, 2)
-    );
+      JSON.stringify(configData, null, 2),
+    )
   } catch (error) {
-    console.error("Failed to save API key:", error);
-    throw error;
+    console.error('Failed to save API key:', error)
+    throw error
   }
 }
 
-async function getInputs(inputs: string): Promise<string> {
-  if (inputs.startsWith("@")) {
-    const filePath = inputs.slice(1);
+async function _getInputs(inputs: string): Promise<string> {
+  if (inputs.startsWith('@')) {
+    const filePath = inputs.slice(1)
     try {
-      const fileContent = await Deno.readTextFile(filePath);
-      return fileContent;
+      const fileContent = await Deno.readTextFile(filePath)
+      return fileContent
     } catch (error) {
-      console.error(`Failed to read inputs from file: ${filePath}`, error);
-      Deno.exit(1);
+      console.error(`Failed to read inputs from file: ${filePath}`, error)
+      Deno.exit(1)
     }
   }
-  return inputs;
+  return inputs
 }
 
-function highlightJson(json: string): string {
+function _highlightJson(json: string): string {
   return json.replace(
     /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:\s*)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,
     (match) => {
-      let cls = green;
+      let cls = green
       if (/^"/.test(match)) {
         if (/:$/.test(match)) {
-          cls = cyan;
+          cls = cyan
         } else {
-          cls = yellow;
+          cls = yellow
         }
       } else if (/true|false/.test(match)) {
-        cls = red;
+        cls = red
       } else if (/null/.test(match)) {
-        cls = red;
+        cls = red
       }
-      return cls(match);
-    }
-  );
+      return cls(match)
+    },
+  )
 }
 
 async function executeEphemeralWorkflow(
@@ -91,214 +95,242 @@ async function executeEphemeralWorkflow(
   inputs: string,
   apiKey: string,
   config: string,
-  outputPath?: string
+  outputPath?: string,
 ): Promise<void> {
   try {
-    console.log(bold(green("Executing workflow...")));
-    console.log(bold("Workflow ID:"), workflowId);
-
+    console.log(bold(green('Executing workflow...')))
+    console.log(bold('Workflow ID:'), workflowId)
     for await (const file of expandGlob(config)) {
-      console.log(bold("Config file:"), file.path);
+      console.log(bold('Config file:'), file.path)
 
-      const configData = await Deno.readTextFile(file.path);
-      const configJson = parse(configData);
+      const configData = await Deno.readTextFile(file.path)
+      const configJson = parse(configData)
 
-      console.log(bold("configJson"), configJson);
+      console.log(bold('configJson'), configJson)
 
+      // inputs is a file path, read the file and parse it as json
+      const inputsJson = await Deno.readTextFile(inputs)
       const body = JSON.stringify({
-        inputs: JSON.parse(inputs),
+        inputs: JSON.parse(inputsJson),
         workflow_config: configJson,
-      });
+      })
 
-      console.log(bold("body"), body);
+      console.log(bold('body'), body)
 
       const response = await fetch(`${BASE_URL}/v2/workflows/execute`, {
-        method: "POST",
+        method: 'POST',
         headers: {
           Authorization: `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body,
-      });
+      })
 
       if (!response.ok) {
-        console.log(bold(red("Error message")), response.statusText);
-        console.log(bold(red("Error status")), response.status);
-        throw new Error(`HTTP error! status: ${response.status}`);
+        console.log(bold(red('Error message')), response.statusText)
+        console.log(bold(red('Error status')), response.status)
+        throw new Error(`HTTP error! status: ${response.status}`)
       }
 
-      const result = await response.json();
-      console.log(bold(green("Workflow executed successfully:")));
-      console.dir(result, { depth: null, colors: true });
+      const result = await response.json()
+      console.log(bold(green('Workflow executed successfully:')))
+      console.dir(result, { depth: null, colors: true })
 
-      console.log(bold("outputPath"), outputPath);
+      console.log(bold('outputPath'), outputPath)
 
       if (outputPath) {
-        await Deno.writeTextFile(outputPath, JSON.stringify(result, null, 2));
-        console.log(bold(green(`Workflow result written to ${outputPath}`)));
+        await Deno.writeTextFile(outputPath, JSON.stringify(result, null, 2))
+        console.log(bold(green(`Workflow result written to ${outputPath}`)))
       }
     }
   } catch (error) {
-    console.error(bold(red("Failed to execute workflow:")), error);
-    Deno.exit(1);
+    console.error(bold(red('Failed to execute workflow:')), error)
+    Deno.exit(1)
   }
+}
+
+interface WorkflowConfig {
+  workflow_config: JSON
+  workflow_key?: string
 }
 
 async function deployWorkflow(
   configPath: string,
-  apiKey: string
+  apiKey: string,
 ): Promise<void> {
   try {
-    console.log(bold(green("Deploying workflow...")));
+    console.log(bold(green('Deploying workflow...')))
 
-    const configData = await Deno.readTextFile(configPath);
+    const configData = await Deno.readTextFile(configPath)
+    const parsedConfig = parse(configData) as WorkflowConfig
+    const workflowConfig = parsedConfig.workflow_config
+    const workflowKey = parsedConfig.workflow_key
 
-    const workflowConfig = configJson.workflow_config;
-    const workflowKey = configJson.workflow_key;
-
-    if (!configJson) {
-      console.error("Error: Invalid config file.");
-      Deno.exit(1);
+    if (!parsedConfig) {
+      console.error('Error: Invalid config file.')
+      Deno.exit(1)
     }
     if (!workflowKey) {
-      console.error("Error: Invalid workflow key.");
-      Deno.exit(1);
+      console.error('Error: Invalid workflow key.')
+      Deno.exit(1)
     }
 
     const response = await fetch(
       `${BASE_URL}/v2/workflows?workflow_key=${workflowKey}`,
       {
-        method: "POST",
+        method: 'POST',
         headers: {
           Authorization: `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify(workflowConfig),
-      }
-    );
+      },
+    )
 
-    console.log(bold("Response status:"), response.status);
-    console.log(bold("Response status text:"), response.statusText);
+    console.log(bold('Response status:'), response.status)
+    console.log(bold('Response status text:'), response.statusText)
 
     if (!response.ok) {
       if (response.status === 409) {
-        console.log(bold(yellow("Workflow Exists, Creating New Revision...")));
+        console.log(bold(yellow('Workflow Exists, Creating New Revision...')))
         const response = await fetch(
           `${BASE_URL}/v2/workflows/revisions?workflow_key=${workflowKey}`,
           {
-            method: "POST",
+            method: 'POST',
             headers: {
               Authorization: `Bearer ${apiKey}`,
-              "Content-Type": "application/json",
+              'Content-Type': 'application/json',
             },
             body: JSON.stringify(workflowConfig),
-          }
-        );
+          },
+        )
 
         if (!response.ok) {
-          console.log(bold(red("Error response body:")), await response.text());
-          throw new Error(`HTTP error! status: ${response.status}`);
+          console.log(bold(red('Error response body:')), await response.text())
+          throw new Error(`HTTP error! status: ${response.status}`)
         }
 
-        const result = await response.json();
+        const result = await response.json()
 
-        const workflowId = result.data.workflow_id;
-        const urlToWorkflow = `https://studio.scoutos.com/workflows/${workflowId}`;
+        const workflowId = result.data.workflow_id
+        const urlToWorkflow =
+          `https://studio.scoutos.com/workflows/${workflowId}`
 
         console.log(
           bold(
             green(
-              `Workflow revision created successfully. You can view the workflow at ${urlToWorkflow}`
-            )
-          )
-        );
+              `Workflow revision created successfully. You can view the workflow at ${urlToWorkflow}`,
+            ),
+          ),
+        )
       }
     } else {
-      const result = await response.json();
+      const result = await response.json()
 
-      const workflowId = result.data.workflow_id;
-      const urlToWorkflow = `https://studio.scoutos.com/workflows/${workflowId}`;
+      const workflowId = result.data.workflow_id
+      const urlToWorkflow = `https://studio.scoutos.com/workflows/${workflowId}`
       console.log(
         bold(
           green(
-            `Workflow deployed successfully. You can view the workflow at ${urlToWorkflow}`
-          )
-        )
-      );
+            `Workflow deployed successfully. You can view the workflow at ${urlToWorkflow}`,
+          ),
+        ),
+      )
     }
   } catch (error) {
-    console.error(bold(red("Failed to deploy workflow:")), error);
-    Deno.exit(1);
+    console.error(bold(red('Failed to deploy workflow:')), error)
+    Deno.exit(1)
   }
 }
 
-const runCommand = new Command()
-  .description("Run a workflow")
-  .arguments("<workflow_id:string>")
+const runCommand: CommandType = new Command()
+  .description('Run a workflow')
+  .arguments('<workflow_id:string>')
   .option(
-    "-i, --inputs <inputs:string>",
-    "JSON string of inputs for the workflow"
+    '-i, --inputs <inputs:string>',
+    'JSON string of inputs for the workflow',
   )
-  .option("-c, --config <config:string>", "Path to the config file")
-  .option("-o, --output <output:string>", "Path to save the output")
+  .option('-c, --config <config:string>', 'Path to the config file')
+  .option('-o, --output <output:string>', 'Path to save the output')
   .action(async ({ inputs, config, output }, workflowId) => {
-    let apiKey = await getStoredApiKey();
+    let apiKey = await getStoredApiKey()
     if (!apiKey) {
-      console.log(bold("Please enter your API key:"));
-      apiKey = prompt("API Key:");
+      console.log(bold('Please enter your API key:'))
+      apiKey = prompt('API Key:')
       if (!apiKey) {
-        console.error(bold(red("API key is required")));
-        Deno.exit(1);
+        console.error(bold(red('API key is required')))
+        Deno.exit(1)
       }
-      await saveApiKey(apiKey);
+      await saveApiKey(apiKey)
     }
-    await executeEphemeralWorkflow(workflowId, inputs, apiKey, config, output);
-  });
+    if (!inputs) {
+      console.error(bold(red('Inputs are required')))
+      Deno.exit(1)
+    }
+    if (!config) {
+      console.error(bold(red('Config is required')))
+      Deno.exit(1)
+    }
+    if (!workflowId) {
+      console.error(bold(red('Workflow ID is required')))
+      Deno.exit(1)
+    }
+    await executeEphemeralWorkflow(workflowId, inputs, apiKey, config, output)
+  })
 
-const getCommand = new Command()
-  .description("Get a workflow")
-  .arguments("<workflow_id:string>")
-  .option("-o, --output <output:string>", "Path to save the output")
+const getCommand: CommandType = new Command()
+  .description('Get a workflow')
+  .arguments('<workflow_id:string>')
+  .option('-o, --output <output:string>', 'Path to save the output')
   .action(async ({ output }, workflowId) => {
-    let apiKey = await getStoredApiKey();
+    let apiKey = await getStoredApiKey()
     if (!apiKey) {
-      console.log(bold("Please enter your API key:"));
-      apiKey = prompt("API Key:");
+      console.log(bold('Please enter your API key:'))
+      apiKey = prompt('API Key:')
       if (!apiKey) {
-        console.error(bold(red("API key is required")));
-        Deno.exit(1);
+        console.error(bold(red('API key is required')))
+        Deno.exit(1)
       }
-      await saveApiKey(apiKey);
+      await saveApiKey(apiKey)
     }
-    await getWorkflow(workflowId, apiKey, output);
-  });
+    console.log('Out and workflowId', output, workflowId)
+    // TODO: Implement getWorkflow (where does it go? saved as yaml file locally?)
+    // await getWorkflow(workflowId, apiKey, output);
+  })
 
-const deployCommand = new Command()
-  .description("Deploy a workflow")
-  .option("-c, --config <config:string>", "Path to the config file")
+const deployCommand: CommandType = new Command()
+  .description('Deploy a workflow')
+  .option('-c, --config <config:string>', 'Path to the config file')
   .action(async ({ config }) => {
-    let apiKey = await getStoredApiKey();
+    let apiKey = await getStoredApiKey()
     if (!apiKey) {
-      console.log(bold("Please enter your API key:"));
-      apiKey = prompt("API Key:");
+      console.log(bold('Please enter your API key:'))
+      apiKey = prompt('API Key:')
       if (!apiKey) {
-        console.error(bold(red("API key is required")));
-        Deno.exit(1);
+        console.error(bold(red('API key is required')))
+        Deno.exit(1)
       }
-      await saveApiKey(apiKey);
+      await saveApiKey(apiKey)
     }
-    await deployWorkflow(config, apiKey);
-  });
+    if (!config) {
+      console.error(bold(red('Config is required')))
+      Deno.exit(1)
+    }
+    await deployWorkflow(config, apiKey)
+  })
 
-const workflowsCommand = new Command()
-  .description("Manage workflows")
-  .command("run", runCommand)
-  .command("deploy", deployCommand)
-  .command("get", getCommand);
+const workflowsCommand: CommandType = new Command()
+  .description('Manage workflows')
+  .command('run', runCommand)
+  .command('deploy', deployCommand)
+  .command('get', getCommand)
 
-await new Command()
-  .name("scout")
-  .version("0.1.0")
-  .description("Scout CLI tool")
-  .command("workflows", workflowsCommand) // This line registers the workflowsCommand
-  .parse(Deno.args);
+export const scoutCli: CommandType = new Command()
+  .name('scout')
+  .version('0.1.1')
+  .description('Scout CLI tool')
+  .command('workflows', workflowsCommand) // This line registers the workflowsCommand
+
+if (import.meta.main) {
+  await scoutCli.parse(Deno.args)
+}
