@@ -10,7 +10,6 @@ import { config, scoutCli } from './mod.ts'
 const originalConsoleLog = console.log
 const originalPrompt = globalThis.prompt
 
-
 // Restore original console.log after all tests
 Deno.test({
   name: 'Cleanup',

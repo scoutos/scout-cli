@@ -326,6 +326,6 @@ export const scoutCli = new Command()
   .description('Scout CLI tool')
   .command('workflows', workflowsCommand) // This line registers the workflowsCommand
 
-  if (import.meta.main) {
-    await scoutCli.parse(Deno.args)
-  }
+if (import.meta.main) {
+  await scoutCli.parse(Deno.args)
+}
