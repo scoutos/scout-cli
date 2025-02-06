@@ -3,11 +3,6 @@ name: Build Artifact
 on:
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
-    types: [opened, synchronize, reopened]
-  release:
-    types: [created]
 
 jobs:
   build:
@@ -61,8 +56,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    # uses: actions/create-release@v4 / unknown
-    # if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     steps:
       - name: Download all artifacts
         uses: actions/download-artifact@v4
