@@ -6,7 +6,6 @@ on:
   pull_request:
     branches: [main]
     types: [opened, synchronize, reopened]
-  # Optionally trigger on release
   release:
     types: [created]
 
@@ -74,7 +73,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           name: Executables Release ${{ github.sha }}
-          tag_name: latest # release-${{ github.sha }}
+          tag_name: latest
           files: |
             artifacts/scout-cli-linux/scout-cli-linux
             artifacts/scout-cli-windows.exe/scout-cli-windows.exe
@@ -83,8 +82,3 @@ jobs:
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Print Release URL
-        run: |
-          echo "Release was created at: https://github.com/${{ github.repository }}/releases/tag/release-${{ github.sha }}"
-          echo "Artifacts should be available at: https://github.com/${{ github.repository }}/releases/download/release-${{ github.sha }}/"
