@@ -49,17 +49,27 @@ jobs:
         env:
           DENO_DIR: ./temp/deno-dir
 
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ matrix.output }}
-          path: ${{ matrix.output }}
+      # Add debug steps
+      - name: Debug - List Files
+        run: |
+          echo "Current directory contents:"
+          ls -la
+          echo "Output file location:"
+          find . -name "${{ matrix.output }}"
+          echo "Artifact server path contents:"
+          ls -la /tmp/artifacts || echo "No artifacts directory yet"
+
+      # - name: Upload Artifact
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: ${{ matrix.output }}
+      #     path: ${{ matrix.output }}
 
   release:
     name: Release Artifact
     needs: build
-    runs-on: ubuntu-latest
-    uses: actions/create-release@v4
+    # runs-on: ubuntu-latest / unknown prop
+    # uses: actions/create-release@v4 / unknown
     # if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     steps:
       - name: Download all artifacts
@@ -80,3 +90,8 @@ jobs:
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Print Release URL
+        run: |
+          echo "Release was created at: https://github.com/${{ github.repository }}/releases/tag/release-${{ github.sha }}"
+          echo "Artifacts should be available at: https://github.com/${{ github.repository }}/releases/download/release-${{ github.sha }}/"
