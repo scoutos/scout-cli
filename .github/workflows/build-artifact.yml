@@ -5,9 +5,10 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+    types: [opened, synchronize, reopened]
   # Optionally trigger on release
-#   release:
-#     types: [created]
+  release:
+    types: [created]
 
 jobs:
   build:
@@ -49,49 +50,39 @@ jobs:
         env:
           DENO_DIR: ./temp/deno-dir
 
-      # Add debug steps
-      - name: Debug - List Files
-        run: |
-          echo "Current directory contents:"
-          ls -la
-          echo "Output file location:"
-          find . -name "${{ matrix.output }}"
-          echo "Artifact server path contents:"
-          ls -la /tmp/artifacts || echo "No artifacts directory yet"
-
-      # - name: Upload Artifact
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: ${{ matrix.output }}
-      #     path: ${{ matrix.output }}
-
-  release:
-    name: Release Artifact
-    needs: build
-    # runs-on: ubuntu-latest / unknown prop
-    # uses: actions/create-release@v4 / unknown
-    # if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    steps:
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
         with:
-          path: artifacts
+          name: ${{ matrix.output }}
+          path: ${{ matrix.output }}
 
-      - name: Create Release
-        uses: softprops/action-gh-release@v1
-        with:
-          name: Release ${{ github.sha }}
-          tag_name: release-${{ github.sha }}
-          files: |
-            artifacts/scout-cli-linux/scout-cli-linux
-            artifacts/scout-cli-windows.exe/scout-cli-windows.exe
-            artifacts/scout-cli-macos/scout-cli-macos
-          draft: false
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  # release:
+  #   name: Release Artifact
+  #   needs: build
+  #   # runs-on: ubuntu-latest / unknown prop
+  #   # uses: actions/create-release@v4 / unknown
+  #   # if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+  #   steps:
+  #     - name: Download all artifacts
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         path: artifacts
 
-      - name: Print Release URL
-        run: |
-          echo "Release was created at: https://github.com/${{ github.repository }}/releases/tag/release-${{ github.sha }}"
-          echo "Artifacts should be available at: https://github.com/${{ github.repository }}/releases/download/release-${{ github.sha }}/"
+  #     - name: Create Release
+  #       uses: softprops/action-gh-release@v1
+  #       with:
+  #         name: Release ${{ github.sha }}
+  #         tag_name: release-${{ github.sha }}
+  #         files: |
+  #           artifacts/scout-cli-linux/scout-cli-linux
+  #           artifacts/scout-cli-windows.exe/scout-cli-windows.exe
+  #           artifacts/scout-cli-macos/scout-cli-macos
+  #         draft: false
+  #         prerelease: false
+  #       env:
+  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  #     - name: Print Release URL
+  #       run: |
+  #         echo "Release was created at: https://github.com/${{ github.repository }}/releases/tag/release-${{ github.sha }}"
+  #         echo "Artifacts should be available at: https://github.com/${{ github.repository }}/releases/download/release-${{ github.sha }}/"
