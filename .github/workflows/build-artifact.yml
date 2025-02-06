@@ -73,8 +73,8 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          name: Release ${{ github.sha }}
-          tag_name: release-${{ github.sha }}
+          name: Executables Release ${{ github.sha }}
+          tag_name: latest # release-${{ github.sha }}
           files: |
             artifacts/scout-cli-linux/scout-cli-linux
             artifacts/scout-cli-windows.exe/scout-cli-windows.exe
