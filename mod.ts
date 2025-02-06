@@ -15,7 +15,7 @@ import {
 } from 'https://deno.land/std@0.218.0/fmt/colors.ts'
 import { expandGlob } from 'https://deno.land/std@0.218.0/fs/mod.ts'
 
-const BASE_URL = 'https://api.scoutos.com'
+const BASE_URL = 'https://api-prod.scoutos.com'
 
 export const config: {
   CONFIG_DIR: string
