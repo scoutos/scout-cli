@@ -59,7 +59,7 @@ jobs:
   release:
     name: Release Artifact
     needs: build
-    # runs-on: ubuntu-latest / unknown prop
+    runs-on: ubuntu-latest
     # uses: actions/create-release@v4 / unknown
     # if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     steps:
