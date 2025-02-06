@@ -60,6 +60,8 @@ jobs:
     name: Release Artifact
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     # uses: actions/create-release@v4 / unknown
     # if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     steps:
