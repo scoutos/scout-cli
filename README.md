@@ -25,8 +25,10 @@ deno task dev workflows get workflow_id_123
 
 ### Using `scout-cli`
 
-1. (Update or Delete this line) Download the appropriate executable for your system from the [Latest Release](https://github.com/scoutos/scout-cli/releases/tag/latest/). For this example we will download the `scout-cli-macos` artifact. Or just [click here for macos download](https://github.com/scoutos/scout-cli/releases/tag/latest/scout-cli-macos).
-
+1. (Update or Delete this line) Download the appropriate executable for your system from the [Latest Release](https://github.com/scoutos/scout-cli/releases/tag/latest/). For this example we will download the `scout-cli-macos` artifact. 
+- [macos](https://github.com/scoutos/scout-cli/releases/tag/latest/scout-cli-macos).
+- [linux](https://github.com/scoutos/scout-cli/releases/tag/latest/scout-cli-linux).
+- [windows](https://github.com/scoutos/scout-cli/releases/tag/latest/scout-cli-windows.exe).
 - Alternatively, you can build the cli from source `deno compile --allow-read --allow-write --allow-env --allow-net --output scout-cli-macos mod.ts`.
 
 2. If you downloaded the zipped artifact, Unzip the file then run the following commands to make the executable available on your system:

@@ -3,6 +3,8 @@ name: Build Artifact
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
   build:
@@ -53,6 +55,8 @@ jobs:
   release:
     name: Release Artifact
     needs: build
+    # Only run release on push to main, skip for PRs
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
       contents: write
