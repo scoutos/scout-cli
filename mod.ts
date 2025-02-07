@@ -33,6 +33,12 @@ export const config: {
 type CommandType = Command<any, any, any, any, any, any, any, any>
 
 async function getStoredApiKey(): Promise<string | null> {
+  // First check for environment variable
+  const envApiKey = Deno.env.get('SCOUT_API_KEY')
+  if (envApiKey) {
+    return envApiKey
+  }
+  // Fall back to stored key
   try {
     const configData = await Deno.readTextFile(config.CONFIG_FILE)
     return JSON.parse(configData).apiKey || null
