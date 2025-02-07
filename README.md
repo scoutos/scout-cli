@@ -44,8 +44,12 @@ sudo mv scout-cli-macos /usr/local/bin/scout-cli
 
 3. Now you should be able to use `scout-cli` from your system! Trying running `scout-cli --help` to see if it works.
 4. If you want to remove the cli you can run `sudo rm /usr/local/bin/scout-cli`.
+5. **Note**: You may have to grant the cli permissions to write, read, delete to your system.
 
-When you first use the cli tool, you will be asked to set your `apikey`. This should be the secret key found in "API Keys" section in the Scout dashboard settings panel. **Note**: You may have to grant the cli permissions to write, read, delete to your system. The api key will be stored in `~/.scout-cli/secrets.json`.
+### Setup API Key
+
+1. When you first use the cli tool, you will be asked to set your `apikey`. This should be the secret key found in "API Keys" section in the Scout dashboard settings panel. The api key will be stored in `~/.scout-cli/secrets.json`.
+2. Alternatively, you can set the `SCOUT_API_KEY` environment variable. This is useful if you want to use the cli in a CI/CD pipeline.
 
 Example command:
 
