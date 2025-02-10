@@ -1,9 +1,9 @@
 // deno-lint-ignore-file
 // @ts-ignore no-slow-types
-
+// import { ScoutClient, Scout } from "scoutos"
 import { Command } from 'https://deno.land/x/cliffy@v0.25.7/command/mod.ts'
 import { join } from 'https://deno.land/std@0.218.0/path/mod.ts'
-// import scoutos from "npm:scoutos@0.7.1";
+import { ScoutClient, Scout} from "npm:scoutos@0.8.4";
 // import { json2yaml } from "https://deno.land/x/json2yaml/mod.ts";
 import { parse } from 'jsr:@std/yaml'
 import {
@@ -116,29 +116,28 @@ async function executeEphemeralWorkflow(
 
       // inputs is a file path, read the file and parse it as json
       const inputsJson = await Deno.readTextFile(inputs)
-      const body = JSON.stringify({
+      // const body = JSON.stringify({
+      //   inputs: JSON.parse(inputsJson),
+      //   workflow_config: configJson,
+      // })
+      // console.log(bold('body'), body)
+
+      const client = new ScoutClient({ apiKey: apiKey });
+      const result: Scout.WorkflowsRunWithConfigResponse = await client.workflows.runWithConfig({
         inputs: JSON.parse(inputsJson),
-        workflow_config: configJson,
+        workflow_config: configJson as Scout.WorkflowConfigInput,
       })
+      console.log(bold('response!!!'), result)
 
-      console.log(bold('body'), body)
+      // const response = await fetch(`${BASE_URL}/v2/workflows/execute`, {
+      //   method: 'POST',
+      //   headers: {
+      //     Authorization: `Bearer ${apiKey}`,
+      //     'Content-Type': 'application/json',
+      //   },
+      //   body,
+      // })
 
-      const response = await fetch(`${BASE_URL}/v2/workflows/execute`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body,
-      })
-
-      if (!response.ok) {
-        console.log(bold(red('Error message')), response.statusText)
-        console.log(bold(red('Error status')), response.status)
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-
-      const result = await response.json()
       console.log(bold(green('Workflow executed successfully:')))
       console.dir(result, { depth: null, colors: true })
 
@@ -164,87 +163,63 @@ async function deployWorkflow(
   configPath: string,
   apiKey: string,
 ): Promise<void> {
+  console.log(bold(green('Deploying workflow...')))
+  const client = new ScoutClient({ apiKey: apiKey });
+  const configData = await Deno.readTextFile(configPath)
+  const parsedConfig = parse(configData) as WorkflowConfig
+  const workflowConfig = parsedConfig.workflow_config
+  const workflowKey = parsedConfig.workflow_key
+
+  if (!parsedConfig) {
+    console.error('Error: Invalid config file.')
+    Deno.exit(1)
+  }
+  if (!workflowKey) {
+    console.error('Error: Invalid workflow key.')
+    Deno.exit(1)
+  }
+
   try {
-    console.log(bold(green('Deploying workflow...')))
-
-    const configData = await Deno.readTextFile(configPath)
-    const parsedConfig = parse(configData) as WorkflowConfig
-    const workflowConfig = parsedConfig.workflow_config
-    const workflowKey = parsedConfig.workflow_key
-
-    if (!parsedConfig) {
-      console.error('Error: Invalid config file.')
-      Deno.exit(1)
-    }
-    if (!workflowKey) {
-      console.error('Error: Invalid workflow key.')
-      Deno.exit(1)
-    }
-
-    const response = await fetch(
-      `${BASE_URL}/v2/workflows?workflow_key=${workflowKey}`,
-      {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(workflowConfig),
-      },
+    const response: Scout.SrcHandlersCreateWorkflowRevisionResponse = await client.workflows.create({
+      workflow_key: workflowKey,
+      body: workflowConfig,
+    } as Scout.WorkflowsCreateRequest)
+    console.log('response', response)
+    const workflowId = response?.data?.workflow_id
+    const urlToWorkflow = `https://studio.scoutos.com/workflows/${workflowId}`
+    console.log(
+      bold(
+        green(
+          `Workflow deployed successfully. You can view the workflow at ${urlToWorkflow}`,
+        ),
+      ),
     )
-
-    console.log(bold('Response status:'), response.status)
-    console.log(bold('Response status text:'), response.statusText)
-
-    if (!response.ok) {
-      if (response.status === 409) {
-        console.log(bold(yellow('Workflow Exists, Creating New Revision...')))
-        const response = await fetch(
-          `${BASE_URL}/v2/workflows/revisions?workflow_key=${workflowKey}`,
-          {
-            method: 'POST',
-            headers: {
-              Authorization: `Bearer ${apiKey}`,
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(workflowConfig),
-          },
-        )
-
-        if (!response.ok) {
-          console.log(bold(red('Error response body:')), await response.text())
-          throw new Error(`HTTP error! status: ${response.status}`)
-        }
-
-        const result = await response.json()
-
-        const workflowId = result.data.workflow_id
-        const urlToWorkflow =
-          `https://studio.scoutos.com/workflows/${workflowId}`
-
-        console.log(
-          bold(
-            green(
-              `Workflow revision created successfully. You can view the workflow at ${urlToWorkflow}`,
-            ),
-          ),
-        )
-      }
-    } else {
-      const result = await response.json()
-
-      const workflowId = result.data.workflow_id
-      const urlToWorkflow = `https://studio.scoutos.com/workflows/${workflowId}`
+  } catch (error: any) {
+    if (error?.statusCode) {
+      console.log(bold('Response status:'), error.statusCode)
+    }
+    if (error?.body) {
+      console.log(bold('Response status text:'), error.body)
+    }
+    if (error.statusCode === 409) {
+      console.log(bold(yellow('Workflow Exists, Creating New Revision...')))
+      const response: Scout.SrcHandlersCreateWorkflowRevisionResponse = await client.workflows.createRevision({
+        workflow_key: workflowKey,
+        body: workflowConfig,
+      } as Scout.WorkflowsCreateRevisionRequest)
+      const workflowId = response?.data?.workflow_id
+      const urlToWorkflow =
+        `https://studio.scoutos.com/workflows/${workflowId}`
       console.log(
         bold(
           green(
-            `Workflow deployed successfully. You can view the workflow at ${urlToWorkflow}`,
+            `Workflow revision created successfully. You can view the workflow at ${urlToWorkflow}`,
           ),
         ),
       )
+    } else {
+      console.error(bold(red('Failed to deploy workflow:')), error)
     }
-  } catch (error) {
-    console.error(bold(red('Failed to deploy workflow:')), error)
     Deno.exit(1)
   }
 }
@@ -284,6 +259,18 @@ const runCommand: CommandType = new Command()
     await executeEphemeralWorkflow(workflowId, inputs, apiKey, config, output)
   })
 
+const loginCommand: CommandType = new Command()
+  .description('Login to Scout')
+  .action(async () => {
+    console.log(bold(green('Logging in...')))
+    const apiKey = prompt('API Key:')
+    if (!apiKey) {
+      console.error(bold(red('API key is required')))
+      Deno.exit(1)
+    }
+    await saveApiKey(apiKey)
+  })
+
 const getCommand: CommandType = new Command()
   .description('Get a workflow')
   .arguments('<workflow_id:string>')
@@ -299,7 +286,7 @@ const getCommand: CommandType = new Command()
       }
       await saveApiKey(apiKey)
     }
-    console.log('Out and workflowId', output, workflowId)
+    console.log('Output and workflowId', output, workflowId)
     // TODO: Implement getWorkflow (where does it go? saved as yaml file locally?)
     // await getWorkflow(workflowId, apiKey, output);
   })
@@ -335,7 +322,16 @@ export const scoutCli: CommandType = new Command()
   .name('scout')
   .version('0.1.1')
   .description('Scout CLI tool')
-  .command('workflows', workflowsCommand) // This line registers the workflowsCommand
+  .command("version", new Command()
+    .description("Show version information")
+    .action(() => {
+      console.log(`scout-cli version: ${scoutCli.getVersion()}`)
+      console.log(`scoutos version: ${scoutosVersion}`)
+    })
+  )
+  .command('workflows', workflowsCommand)
+  .command('login', loginCommand)
+
 
 if (import.meta.main) {
   await scoutCli.parse(Deno.args)
