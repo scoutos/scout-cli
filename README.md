@@ -18,13 +18,13 @@
 
 ```bash
 # Move & rename executable 
-sudo mv scout-cli-macos /usr/local/bin/scout-cli
+sudo mv scout-cli-macos /usr/local/bin/scout
 ```
 
-3. Now you should be able to use `scout-cli` from your system! Trying running `scout-cli --help` to see if it works.
-4. If you want to remove the cli you can run `sudo rm /usr/local/bin/scout-cli`.
+3. Now you should be able to use `scout` from your system! Trying running `scout --help` to see if it works.
+4. If you want to remove the cli you can run `sudo rm /usr/local/bin/scout`.
 5. **Note**: You may have to grant the cli permissions to write, read, delete to your system.
-   - `sudo chmod +x /usr/local/bin/scout-cli`
+   - `sudo chmod +x /usr/local/bin/scout`
 
 ### API Key
 
@@ -34,11 +34,11 @@ sudo mv scout-cli-macos /usr/local/bin/scout-cli
 Example command:
 
 ```bash
-scout-cli workflows deploy --config ./workflows/top_trending.yml
+scout workflows deploy --config ./workflows/top_trending.yml
 ```
 
 ```bash
-scout-cli workflows run --config ./workflows/top_trending.yml --inputs ./inputs/top_trending.json
+scout workflows run --config ./workflows/top_trending.yml --inputs ./inputs/top_trending.json
 ```
 
 ### Using Templates
