@@ -6,6 +6,7 @@
 ## Using `scout-cli`
 
 ### Setup
+
 1. Download the appropriate executable for your system from the [Latest Release](https://github.com/scoutos/scout-cli/releases/tag/latest/). For this example we will download the `scout-cli-macos` artifact.
 
 - [macos](https://github.com/scoutos/scout-cli/releases/tag/latest/scout-cli-macos).
@@ -14,6 +15,7 @@
 - Alternatively, you can build the cli from source `deno compile --allow-read --allow-write --allow-env --allow-net --output scout-cli-macos mod.ts`.
 
 2. You might need to move & rename the executable to a location where your system can find it.
+
 ```bash
 # Move & rename executable 
 sudo mv scout-cli-macos /usr/local/bin/scout-cli
@@ -34,6 +36,7 @@ Example command:
 ```bash
 scout-cli workflows deploy --config ./workflows/top_trending.yml
 ```
+
 ```bash
 scout-cli workflows run --config ./workflows/top_trending.yml --inputs ./inputs/top_trending.json
 ```
@@ -64,7 +67,6 @@ This will:
 ```bash
 scout workflows deploy --config ./workflows/name_of_your_workflow.yml
 ```
-
 
 ## Local Development
 

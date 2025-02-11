@@ -2,7 +2,7 @@
 // @ts-ignore no-slow-types
 import { Command } from 'https://deno.land/x/cliffy@v0.25.7/command/mod.ts'
 import { join } from 'https://deno.land/std@0.218.0/path/mod.ts'
-import { ScoutClient, Scout} from "npm:scoutos@0.8.4";
+import { Scout, ScoutClient } from 'npm:scoutos@0.8.4'
 import { parse } from 'jsr:@std/yaml'
 import {
   bold,
@@ -109,14 +109,15 @@ async function executeEphemeralWorkflow(
 
     // inputs is a file path, read the file and parse it as json
     const inputsJson = await Deno.readTextFile(inputs)
-    const client = new ScoutClient({ apiKey: apiKey });
-    const result: Scout.WorkflowsRunWithConfigResponse = await client.workflows.runWithConfig({
-      inputs: JSON.parse(inputsJson),
-      workflow_config: configJson as Scout.WorkflowConfigInput,
-    })
+    const client = new ScoutClient({ apiKey: apiKey })
+    const result: Scout.WorkflowsRunWithConfigResponse = await client.workflows
+      .runWithConfig({
+        inputs: JSON.parse(inputsJson),
+        workflow_config: configJson as Scout.WorkflowConfigInput,
+      })
 
     console.log(bold(green('Workflow executed successfully:')))
-    console.log("Result" , result)
+    console.log('Result', result)
     console.dir(result, { depth: null, colors: true })
 
     console.log(bold('Output path:'), outputPath)
@@ -142,7 +143,7 @@ async function deployWorkflow(
   apiKey: string,
 ): Promise<void> {
   console.log(bold(green('Deploying workflow...')))
-  const client = new ScoutClient({ apiKey: apiKey });
+  const client = new ScoutClient({ apiKey: apiKey })
   const configData = await Deno.readTextFile(configPath)
   const parsedConfig = parse(configData) as WorkflowConfig
   const workflowConfig = parsedConfig.workflow_config
@@ -158,10 +159,11 @@ async function deployWorkflow(
   }
 
   try {
-    const response: Scout.SrcHandlersCreateWorkflowRevisionResponse = await client.workflows.create({
-      workflow_key: workflowKey,
-      body: workflowConfig,
-    } as Scout.WorkflowsCreateRequest)
+    const response: Scout.SrcHandlersCreateWorkflowRevisionResponse =
+      await client.workflows.create({
+        workflow_key: workflowKey,
+        body: workflowConfig,
+      } as Scout.WorkflowsCreateRequest)
     const workflowId = response?.data?.workflow_id
     const urlToWorkflow = `https://studio.scoutos.com/workflows/${workflowId}`
     console.log(
@@ -180,13 +182,13 @@ async function deployWorkflow(
     }
     if (error.statusCode === 409) {
       console.log(bold(yellow('Workflow Exists, Creating New Revision...')))
-      const response: Scout.SrcHandlersCreateWorkflowRevisionResponse = await client.workflows.createRevision({
-        workflow_key: workflowKey,
-        body: workflowConfig,
-      } as Scout.WorkflowsCreateRevisionRequest)
+      const response: Scout.SrcHandlersCreateWorkflowRevisionResponse =
+        await client.workflows.createRevision({
+          workflow_key: workflowKey,
+          body: workflowConfig,
+        } as Scout.WorkflowsCreateRevisionRequest)
       const workflowId = response?.data?.workflow_id
-      const urlToWorkflow =
-        `https://studio.scoutos.com/workflows/${workflowId}`
+      const urlToWorkflow = `https://studio.scoutos.com/workflows/${workflowId}`
       console.log(
         bold(
           green(
@@ -336,12 +338,14 @@ export const scoutCli: CommandType = new Command()
   .name('scout')
   .version(scoutosVersion)
   .description('Scout CLI tool')
-  .command("version", new Command()
-    .description("Show version information")
-    .action(() => {
-      console.log(`scout-cli version: ${scoutCli.getVersion()}`)
-      console.log(`scoutos version: ${scoutosVersion}`)
-    })
+  .command(
+    'version',
+    new Command()
+      .description('Show version information')
+      .action(() => {
+        console.log(`scout-cli version: ${scoutCli.getVersion()}`)
+        console.log(`scoutos version: ${scoutosVersion}`)
+      }),
   )
   .command('workflows', workflowsCommand)
   .command('login', loginCommand)

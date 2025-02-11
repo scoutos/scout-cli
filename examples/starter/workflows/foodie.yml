@@ -28,6 +28,6 @@ workflow_config:
           - role: user
             content: 'Where can I get food in {{inputs.user_message}}?'
           - role: assistant
-            content: "You should respond with a list of restaurants in the area. Each restaurant should have a name, address, and rating."
+            content: 'You should respond with a list of restaurants in the area. Each restaurant should have a name, address, and rating.'
       dependencies:
         - block_id: inputs
