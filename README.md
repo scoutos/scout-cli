@@ -39,11 +39,11 @@ deno task dev workflows get workflow_id_123
 xattr -d com.apple.quarantine scout-cli-macos
 
 # Move & rename executable 
-sudo mv scout-cli-macos /usr/local/bin/scout-cli
+sudo mv scout-cli-macos /usr/local/bin/scout
 ```
 
-3. Now you should be able to use `scout-cli` from your system! Trying running `scout-cli --help` to see if it works.
-4. If you want to remove the cli you can run `sudo rm /usr/local/bin/scout-cli`.
+3. Now you should be able to use `scout` from your system! Trying running `scout --help` to see if it works.
+4. If you want to remove the cli you can run `sudo rm /usr/local/bin/scout`.
 5. **Note**: You may have to grant the cli permissions to write, read, delete to your system.
 
 ### Setup API Key
@@ -54,7 +54,7 @@ sudo mv scout-cli-macos /usr/local/bin/scout-cli
 Example command:
 
 ```bash
-scout-cli workflows get workflow_id_123
+scout workflows get workflow_id_123
 ```
 
 Should output:
@@ -132,13 +132,13 @@ The CLI provides commands to work with workflow templates:
 1. List all available templates:
 
 ```bash
-scout-cli init --template-list
+scout init --template-list
 ```
 
 2. Initialize a workflow from a template:
 
 ```bash
-scout-cli init --template <template_id>
+scout init --template <template_id>
 ```
 
 This will:
@@ -149,5 +149,5 @@ This will:
 3. You can then deploy this template using the deploy command:
 
 ```bash
-scout-cli workflows deploy --config ./workflows/name_of_your_workflow.yml
+scout workflows deploy --config ./workflows/name_of_your_workflow.yml
 ```
