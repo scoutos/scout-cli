@@ -104,58 +104,27 @@ async function executeEphemeralWorkflow(
 ): Promise<void> {
   try {
     console.log(bold(green('Executing workflow...')), config)
-    console.log('config', config)
-    console.log('expandGlob(config)', expandGlob(config))
     const configData = await Deno.readTextFile(config)
-    // console.log('configData', configData)
-    // for await (const file of expandGlob(config)) {
-    // console.log(bold('Config file:'), file.path)
-
-    // const configData = await Deno.readTextFile(file.path)
     const configJson = parse(configData)
-
-    console.log(bold('configJson'), typeof configJson, configJson)
 
     // inputs is a file path, read the file and parse it as json
     const inputsJson = await Deno.readTextFile(inputs)
-    const body = JSON.stringify({
+    const client = new ScoutClient({ apiKey: apiKey });
+    const result: Scout.WorkflowsRunWithConfigResponse = await client.workflows.runWithConfig({
       inputs: JSON.parse(inputsJson),
       workflow_config: configJson as Scout.WorkflowConfigInput,
     })
-    const response = await fetch(`${BASE_URL}/v2/workflows/execute`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body,
-    })
-
-    if (!response.ok) {
-      console.log(bold(red('Error message')), response.statusText)
-      console.log(bold(red('Error status')), response.status)
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
-    const result = await response.json()
-    console.log('result', result)
-    // const client = new ScoutClient({ apiKey: apiKey });
-    // const result: Scout.WorkflowsRunWithConfigResponse = await client.workflows.runWithConfig({
-    //   inputs: {}, //JSON.parse(inputsJson),
-    //   workflow_config: {} // configJson as Scout.WorkflowConfigInput,
-    // })
 
     console.log(bold(green('Workflow executed successfully:')))
-    console.log('about to result')
     console.log("Result" , result)
     console.dir(result, { depth: null, colors: true })
 
-    console.log(bold('outputPath'), outputPath)
+    console.log(bold('Output path:'), outputPath)
 
     if (outputPath) {
       await Deno.writeTextFile(outputPath, JSON.stringify(result, null, 2))
       console.log(bold(green(`Workflow result written to ${outputPath}`)))
     }
-    // }
     console.log('Done running all workflows')
   } catch (error) {
     console.error(bold(red('Failed to execute workflow:')), error)
