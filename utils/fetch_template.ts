@@ -55,7 +55,7 @@ export async function fetchAndCreateTemplate(templateId?: string) {
 
     // Create file for specific template
     const fileName = `${result.name.toLowerCase().replace(/\s+/g, '_')}.yml`
-    const filePath = `templates/${fileName}`
+    const filePath = `examples/starter/workflows/${fileName}`
 
     // Parse the JSON string from workflow_template_config.code
     let templateConfig: WorkflowTemplateConfig = {}
