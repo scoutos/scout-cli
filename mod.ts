@@ -23,7 +23,7 @@ export const config: {
 } = {
   CONFIG_DIR: join(
     Deno.env.get('HOME') || Deno.env.get('USERPROFILE') || '.',
-    '.scout-cli',
+    '.scout',
   ),
   get CONFIG_FILE() {
     return join(this.CONFIG_DIR, 'secrets.json')

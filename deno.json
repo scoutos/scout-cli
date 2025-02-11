@@ -17,12 +17,12 @@
     "proseWrap": "preserve"
   },
   "install": {
-    "name": "scout-cli",
-    "exe": "scout-cli"
+    "name": "scout",
+    "exe": "scout"
   },
   "permissions": {
-    "read": ["$HOME/.scout-cli"],
-    "write": ["$HOME/.scout-cli"],
+    "read": ["$HOME/.scout"],
+    "write": ["$HOME/.scout"],
     "env": ["HOME", "USERPROFILE"],
     "net": true
   }
