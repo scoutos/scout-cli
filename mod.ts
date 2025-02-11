@@ -1,10 +1,8 @@
 // deno-lint-ignore-file
 // @ts-ignore no-slow-types
-// import { ScoutClient, Scout } from "scoutos"
 import { Command } from 'https://deno.land/x/cliffy@v0.25.7/command/mod.ts'
 import { join } from 'https://deno.land/std@0.218.0/path/mod.ts'
 import { ScoutClient, Scout} from "npm:scoutos@0.8.4";
-// import { json2yaml } from "https://deno.land/x/json2yaml/mod.ts";
 import { parse } from 'jsr:@std/yaml'
 import {
   bold,
@@ -15,7 +13,7 @@ import {
 } from 'https://deno.land/std@0.218.0/fmt/colors.ts'
 import { expandGlob } from 'https://deno.land/std@0.218.0/fs/mod.ts'
 
-const BASE_URL = 'https://api-prod.scoutos.com'
+const scoutosVersion = '0.8.4'
 
 export const config: {
   CONFIG_DIR: string
@@ -97,15 +95,17 @@ function _highlightJson(json: string): string {
 }
 
 async function executeEphemeralWorkflow(
-  workflowId: string,
   inputs: string,
   apiKey: string,
   config: string,
   outputPath?: string,
 ): Promise<void> {
   try {
-    console.log(bold(green('Executing workflow...')))
-    console.log(bold('Workflow ID:'), workflowId)
+    console.log(bold(green('Executing workflow...')), config)
+    console.log('config', config)
+    console.log('expandGlob(config)', expandGlob(config))
+    const configData = await Deno.readTextFile(config)
+    console.log('configData', configData)
     for await (const file of expandGlob(config)) {
       console.log(bold('Config file:'), file.path)
 
@@ -116,29 +116,15 @@ async function executeEphemeralWorkflow(
 
       // inputs is a file path, read the file and parse it as json
       const inputsJson = await Deno.readTextFile(inputs)
-      // const body = JSON.stringify({
-      //   inputs: JSON.parse(inputsJson),
-      //   workflow_config: configJson,
-      // })
-      // console.log(bold('body'), body)
-
       const client = new ScoutClient({ apiKey: apiKey });
       const result: Scout.WorkflowsRunWithConfigResponse = await client.workflows.runWithConfig({
         inputs: JSON.parse(inputsJson),
         workflow_config: configJson as Scout.WorkflowConfigInput,
       })
-      console.log(bold('response!!!'), result)
-
-      // const response = await fetch(`${BASE_URL}/v2/workflows/execute`, {
-      //   method: 'POST',
-      //   headers: {
-      //     Authorization: `Bearer ${apiKey}`,
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body,
-      // })
 
       console.log(bold(green('Workflow executed successfully:')))
+      console.log('about to result')
+      console.log("Result" , result)
       console.dir(result, { depth: null, colors: true })
 
       console.log(bold('outputPath'), outputPath)
@@ -148,6 +134,7 @@ async function executeEphemeralWorkflow(
         console.log(bold(green(`Workflow result written to ${outputPath}`)))
       }
     }
+    console.log('Done running all workflows')
   } catch (error) {
     console.error(bold(red('Failed to execute workflow:')), error)
     Deno.exit(1)
@@ -226,14 +213,13 @@ async function deployWorkflow(
 
 const runCommand: CommandType = new Command()
   .description('Run a workflow')
-  .arguments('<workflow_id:string>')
   .option(
     '-i, --inputs <inputs:string>',
     'JSON string of inputs for the workflow',
   )
   .option('-c, --config <config:string>', 'Path to the config file')
   .option('-o, --output <output:string>', 'Path to save the output')
-  .action(async ({ inputs, config, output }, workflowId) => {
+  .action(async ({ inputs, config, output }) => {
     let apiKey = await getStoredApiKey()
     if (!apiKey) {
       console.log(bold('Please enter your API key:'))
@@ -252,11 +238,7 @@ const runCommand: CommandType = new Command()
       console.error(bold(red('Config is required')))
       Deno.exit(1)
     }
-    if (!workflowId) {
-      console.error(bold(red('Workflow ID is required')))
-      Deno.exit(1)
-    }
-    await executeEphemeralWorkflow(workflowId, inputs, apiKey, config, output)
+    await executeEphemeralWorkflow(inputs, apiKey, config, output)
   })
 
 const loginCommand: CommandType = new Command()
@@ -320,7 +302,7 @@ const workflowsCommand: CommandType = new Command()
 
 export const scoutCli: CommandType = new Command()
   .name('scout')
-  .version('0.1.1')
+  .version(scoutosVersion)
   .description('Scout CLI tool')
   .command("version", new Command()
     .description("Show version information")

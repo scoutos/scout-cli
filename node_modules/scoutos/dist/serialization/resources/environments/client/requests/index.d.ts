@@ -1,1 +1,0 @@
-export { UpdateRequestBody } from "./UpdateRequestBody";
