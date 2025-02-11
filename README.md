@@ -124,3 +124,25 @@ Testing the cli locally:
 ```bash
 deno run dev workflows deploy --config ./examples/starter/workflows/source_mapping.yml
 ```
+
+### Using Templates
+
+The CLI provides commands to work with workflow templates:
+
+1. List available templates:
+```bash
+deno run init
+```
+
+2. Initialize a workflow from a template:
+```bash
+deno run --allow-read --allow-write --allow-env --allow-net mod.ts init --template <template_id>
+```
+
+This will:
+- Create a new workflow configuration file in the `templates` directory
+- Name the file based on the template name (e.g., `ai_slack_bot_advanced.yml`)
+- You can then deploy this template using the deploy command:
+```bash
+deno run --allow-read --allow-write --allow-env --allow-net mod.ts workflows deploy --config ./templates/<template_name>.yml
+```
