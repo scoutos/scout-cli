@@ -162,7 +162,6 @@ async function deployWorkflow(
       workflow_key: workflowKey,
       body: workflowConfig,
     } as Scout.WorkflowsCreateRequest)
-    console.log('response', response)
     const workflowId = response?.data?.workflow_id
     const urlToWorkflow = `https://studio.scoutos.com/workflows/${workflowId}`
     console.log(
