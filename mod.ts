@@ -12,6 +12,7 @@ import {
   yellow,
 } from 'https://deno.land/std@0.218.0/fmt/colors.ts'
 import { expandGlob } from 'https://deno.land/std@0.218.0/fs/mod.ts'
+import { fetchAndCreateTemplate } from './utils/fetch_template.ts'
 
 const scoutosVersion = '0.8.4'
 
@@ -294,6 +295,48 @@ const deployCommand: CommandType = new Command()
     await deployWorkflow(config, apiKey)
   })
 
+const initCommand: CommandType = new Command()
+  .description('Initialize a new workflow from template')
+  .option('--template [template_id:string]', 'Template ID to use')
+  .option('--template-list', 'List all available templates')
+  .action(async ({ template, templateList }) => {
+    try {
+      if (!template && !templateList) {
+        console.log(bold('Please use one of these options:'))
+        console.log(
+          `${
+            cyan('--template')
+          } <template_id>  - Initialize a workflow from template`,
+        )
+        console.log(
+          `${cyan('--template-list')}          - List all available templates`,
+        )
+        return
+      }
+
+      const templates = await fetchAndCreateTemplate(template as string)
+
+      if (templateList) {
+        // List available templates
+        console.log(bold('Available templates:'))
+        templates.forEach((t: any) => {
+          console.log(
+            `${bold(cyan(t.id))} - ${t.name}\n${yellow(t.summary)}\n`,
+          )
+        })
+        return
+      }
+
+      console.log(green(templates.message))
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error
+        ? error.message
+        : 'Unknown error'
+      console.error(red(`Error: ${errorMessage}`))
+      Deno.exit(1)
+    }
+  })
+
 const workflowsCommand: CommandType = new Command()
   .description('Manage workflows')
   .command('run', runCommand)
@@ -313,7 +356,6 @@ export const scoutCli: CommandType = new Command()
   )
   .command('workflows', workflowsCommand)
   .command('login', loginCommand)
-
 
 if (import.meta.main) {
   await scoutCli.parse(Deno.args)

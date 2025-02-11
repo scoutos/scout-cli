@@ -60,3 +60,30 @@ deno task dev --help
 ```bash
 deno task dev workflows deploy --config ./examples/starter/workflows/source_mapping.yml
 ```
+
+### Using Templates
+
+The CLI provides commands to work with workflow templates:
+
+1. List all available templates:
+
+```bash
+scout-cli init --template-list
+```
+
+2. Initialize a workflow from a template:
+
+```bash
+scout-cli init --template <template_id>
+```
+
+This will:
+
+- Create a new workflow configuration file in your current directory
+- Name the file based on the template name (e.g., `ai_slack_bot_advanced.yml`)
+
+3. You can then deploy this template using the deploy command:
+
+```bash
+scout-cli workflows deploy --config ./workflows/name_of_your_workflow.yml
+```
