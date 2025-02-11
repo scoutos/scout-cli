@@ -14,7 +14,7 @@ import {
   yellow,
 } from 'https://deno.land/std@0.218.0/fmt/colors.ts'
 import { expandGlob } from 'https://deno.land/std@0.218.0/fs/mod.ts'
-import { fetchAndCreateTemplate } from "./utils/fetch_template.ts";
+import { fetchAndCreateTemplate } from './utils/fetch_template.ts'
 
 const BASE_URL = 'https://api-prod.scoutos.com'
 
@@ -333,32 +333,40 @@ const initCommand: CommandType = new Command()
   .action(async ({ template, templateList }) => {
     try {
       if (!template && !templateList) {
-        console.log(bold('Please use one of these options:'));
-        console.log(`${cyan('--template')} <template_id>  - Initialize a workflow from template`);
-        console.log(`${cyan('--template-list')}          - List all available templates`);
-        return;
+        console.log(bold('Please use one of these options:'))
+        console.log(
+          `${
+            cyan('--template')
+          } <template_id>  - Initialize a workflow from template`,
+        )
+        console.log(
+          `${cyan('--template-list')}          - List all available templates`,
+        )
+        return
       }
 
-      const templates = await fetchAndCreateTemplate(template as string);
-      
+      const templates = await fetchAndCreateTemplate(template as string)
+
       if (templateList) {
         // List available templates
-        console.log(bold('Available templates:'));
+        console.log(bold('Available templates:'))
         templates.forEach((t: any) => {
           console.log(
-            `${bold(cyan(t.id))} - ${t.name}\n${yellow(t.summary)}\n`
-          );
-        });
-        return;
+            `${bold(cyan(t.id))} - ${t.name}\n${yellow(t.summary)}\n`,
+          )
+        })
+        return
       }
-      
-      console.log(green(templates.message));
+
+      console.log(green(templates.message))
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.error(red(`Error: ${errorMessage}`));
-      Deno.exit(1);
+      const errorMessage = error instanceof Error
+        ? error.message
+        : 'Unknown error'
+      console.error(red(`Error: ${errorMessage}`))
+      Deno.exit(1)
     }
-  });
+  })
 
 const workflowsCommand: CommandType = new Command()
   .description('Manage workflows')
