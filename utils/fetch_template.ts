@@ -54,8 +54,9 @@ export async function fetchAndCreateTemplate(templateId?: string) {
     }
 
     // Create file for specific template
+    const basePath = 'workflows'
     const fileName = `${result.name.toLowerCase().replace(/\s+/g, '_')}.yml`
-    const filePath = `examples/starter/workflows/${fileName}`
+    const filePath = `${basePath}/${fileName}`
 
     // Parse the JSON string from workflow_template_config.code
     let templateConfig: WorkflowTemplateConfig = {}
@@ -90,8 +91,8 @@ export async function fetchAndCreateTemplate(templateId?: string) {
       skipInvalid: true,
     })
 
-    // Create templates directory if it doesn't exist
-    await Deno.mkdir('examples/starter/workflows', { recursive: true })
+    // Create workflows directory if it doesn't exist
+    await Deno.mkdir(basePath, { recursive: true })
     await Deno.writeTextFile(filePath, yamlContent)
 
     return { message: `Template created: ${filePath}` }
