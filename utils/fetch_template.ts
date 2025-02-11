@@ -91,7 +91,7 @@ export async function fetchAndCreateTemplate(templateId?: string) {
     })
 
     // Create templates directory if it doesn't exist
-    await Deno.mkdir('templates', { recursive: true })
+    await Deno.mkdir('examples/starter/workflows', { recursive: true })
     await Deno.writeTextFile(filePath, yamlContent)
 
     return { message: `Template created: ${filePath}` }
