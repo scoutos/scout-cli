@@ -85,12 +85,6 @@ export async function fetchAndCreateTemplate(templateId?: string) {
       skipInvalid: true
     });
 
-    console.log("Response:");
-    console.log(result);
-
-    console.log("Generated YAML content:");
-    console.log(yamlContent);
-
     // Create templates directory if it doesn't exist
     await Deno.mkdir('templates', { recursive: true });
     await Deno.writeTextFile(filePath, yamlContent);
