@@ -1,0 +1,170 @@
+workflow_key: collection_curation_slack_bot
+workflow_config:
+  workflow_display_name: Collection Curation Slack Bot
+  workflow_schema_version: '1.0'
+  workflow_img_url: 'https://ghexww3n55fveb5i.public.blob.vercel-storage.com/slack-icon-512x511-udpsz3x6-ldhcZoP0meoHMGkxE4YpruQwZSSWnl.png'
+  workflow_description: null
+  blocks:
+    - block_archetype_id: com.scoutos.triggers.slack.message
+      block_config: []
+      block_display_name: Slack Message
+      block_id: inputs
+      block_inputs:
+        run_conditions:
+          rules:
+            - conditions:
+                - field: channel_id
+                  value: []
+                  operator: Any Of
+        items:
+          - display_name: Channel ID
+            input_type: short_text
+            default_value: null
+            is_optional: true
+            key: channel_id
+          - display_name: Team ID
+            input_type: short_text
+            default_value: null
+            is_optional: true
+            key: team_id
+          - display_name: User ID
+            input_type: short_text
+            default_value: null
+            is_optional: true
+            key: user_id
+          - display_name: Thread ID
+            input_type: short_text
+            default_value: null
+            is_optional: true
+            key: thread_id
+          - display_name: User Message
+            input_type: long_text
+            default_value: null
+            is_optional: false
+            key: user_message
+          - display_name: Is first message in thread
+            input_type: checkbox
+            default_value: false
+            is_optional: true
+            key: is_first_message_in_thread
+      block_is_output: false
+      dependencies: []
+      input_schema: {}
+      output_schema: []
+      ui:
+        position:
+          x: 598
+          'y': 264
+      trigger_config:
+        trigger_id: trigger_cm6k56ev3002b01s6ni2w3bro
+      ignore_error: false
+    - block_archetype_id: com.scoutos.llm
+      block_config: []
+      block_display_name: Create Title
+      block_id: qlhsj
+      block_inputs:
+        model: gpt-4o
+        response_format: json_object
+        max_tokens: 3000
+        temperature: 0
+        items: []
+        prompt_items:
+          - content: |-
+              A user is sending you some info and you are tasked with creating a short title from the info. what is the title of the document? return json with with this shape:
+
+              {
+              "title": str
+              }
+            role: system
+          - content: '{{inputs.user_message}}'
+            role: user
+      block_is_output: false
+      dependencies:
+        - block_id: inputs
+          ui:
+            edge_type: addBlock
+      input_schema: {}
+      output_schema: []
+      ui:
+        position:
+          x: 598
+          'y': 359
+      trigger_config: null
+      ignore_error: false
+    - block_archetype_id: com.scoutos.llm
+      block_config: []
+      block_display_name: Generate Slack Response
+      block_id: urojd
+      block_inputs:
+        model: gpt-4o
+        response_format: text
+        max_tokens: 3000
+        temperature: 0.7
+        items: []
+        prompt_items:
+          - content: |-
+              a user has sent you a message with information and you have created a document with the info from their message to be used to train futuer scout employees. you have titled it: {{qlhsj.output}}
+
+              tell the user that you have save the info!
+            role: system
+          - content: '{{inputs.user_message}}'
+            role: user
+      block_is_output: false
+      dependencies:
+        - block_id: block_be5iu
+          ui:
+            edge_type: addBlock
+      input_schema: {}
+      output_schema: []
+      ui:
+        position:
+          x: 597
+          'y': 558
+      trigger_config: null
+      ignore_error: false
+    - block_archetype_id: com.scoutos.slack.message.post
+      block_config: []
+      block_display_name: Post Slack Message
+      block_id: cdnyqs
+      block_inputs:
+        text: '{{urojd.output}}'
+        username: AI Notetaker
+        channel_id: '{{inputs.channel_id}}'
+        icon_url: 'https://cdn.sanity.io/images/0cfe0chk/production/d533e1d021797222a61012230bb02a4d83adb1b0-1367x1334.png'
+        items: []
+        thread_id: '{{inputs.thread_id}}'
+      block_is_output: false
+      dependencies:
+        - block_id: urojd
+          ui:
+            edge_type: addBlock
+      input_schema: {}
+      output_schema: []
+      ui:
+        position:
+          x: 596
+          'y': 656
+      trigger_config: null
+      ignore_error: false
+    - block_archetype_id: com.scoutos.save_document
+      block_config: []
+      block_display_name: Save Document to Table
+      block_id: block_be5iu
+      block_inputs:
+        fields:
+          - value: '{{qlhsj.output.title}}'
+            type: string
+        items: []
+      block_is_output: false
+      dependencies:
+        - block_id: qlhsj
+          ui:
+            edge_type: addBlock
+      input_schema: {}
+      output_schema: []
+      ui:
+        position:
+          x: 597
+          'y': 457
+      trigger_config: null
+      ignore_error: false

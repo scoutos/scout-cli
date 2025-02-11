@@ -1,0 +1,56 @@
+workflow_key: email_subject_line_generator
+workflow_config:
+  workflow_display_name: Email Subject Line Generator
+  workflow_schema_version: '1.0'
+  workflow_img_url: 'https://ghexww3n55fveb5i.public.blob.vercel-storage.com/logo-Hc0LIWziEiuDyCP6zhAPXNwjiJLjNT.png'
+  workflow_description: null
+  blocks:
+    - block_archetype_id: com.scoutos.input
+      block_config: []
+      block_display_name: Email
+      block_id: inputs
+      block_inputs:
+        items:
+          - display_name: Email
+            input_type: long_text
+            is_optional: false
+            default_value: 'Paste email for which you want to generate subject line. '
+            key: email
+          - display_name: Tone/Style
+            input_type: short_text
+            is_optional: false
+            default_value: 'Formal, Conversational, Witty '
+            key: tone
+          - display_name: Audience
+            input_type: short_text
+            is_optional: false
+            default_value: 'Marketing professionals, Sales, consumers of....'
+            key: audience
+          - display_name: Desired Action
+            input_type: short_text
+            is_optional: false
+            default_value: 'Download now, Schedule a demo, Read more'
+            key: action
+      dependencies: []
+    - block_archetype_id: com.scoutos.llm
+      block_config: []
+      block_display_name: Subject line
+      block_id: block_x8r4bj
+      block_inputs:
+        model: gpt-4o
+        response_format: text
+        max_tokens: 1000
+        temperature: 0.2
+        items: []
+        prompt_items:
+          - content: |-
+              You are an AI specialized in crafting high-performing email subject lines. Your goal is to generate concise, engaging, and action-oriented subject lines tailored for specific email campaigns. 
+
+              These subject lines should align with the campaign's {{inputs.tone}}, target {{inputs.audience}}, and key objectives/desired action {{inputs.action}}. 
+
+              Each suggestion must be no longer than 10 words and include variations for A/B testing.
+            role: system
+          - content: 'Email {{inputs.email}}'
+            role: user
+      dependencies:
+        - block_id: inputs

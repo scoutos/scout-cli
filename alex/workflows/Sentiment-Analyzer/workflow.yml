@@ -1,0 +1,122 @@
+workflow_key: sentiment_analyzer
+workflow_config:
+  workflow_display_name: Sentiment Analyzer
+  workflow_schema_version: '1.0'
+  workflow_img_url: null
+  workflow_description: null
+  blocks:
+    - block_archetype_id: com.scoutos.input
+      block_config: []
+      block_display_name: Inputs
+      block_id: inputs
+      block_inputs:
+        items:
+          - display_name: Request
+            key: text
+            default_value: This is probably one of the best products I've ever used. The design quality and attention to detail is exceptional. I've only run into one issue with this product and their support team was able to resolve the issue in a matter of minutes. I highly recommend trying it out.
+            is_optional: false
+            input_type: long_text
+      block_is_output: false
+      dependencies: []
+      input_schema: {}
+      output_schema: []
+      ui:
+        position:
+          x: -4
+          'y': 0
+      trigger_config: null
+    - block_archetype_id: com.scoutos.text
+      block_config: []
+      block_display_name: Classes
+      block_id: classes
+      block_inputs:
+        text: |-
+          - Negative
+          - Neutral
+          - Positive
+      block_is_output: false
+      dependencies:
+        - block_id: inputs
+          ui:
+            edge_type: addBlock
+      input_schema: {}
+      output_schema: []
+      ui:
+        position:
+          x: -4
+          'y': 122
+      trigger_config: null
+    - block_archetype_id: com.scoutos.llm
+      block_config: []
+      block_display_name: Classify
+      block_id: classify
+      block_inputs:
+        model: gpt-4o
+        response_format: text
+        max_tokens: 500
+        temperature: 0.7
+        prompt_items:
+          - content: |-
+              You are an expert in lingusitics. You're reviewing a Snippet of Text to determine the sentiment of the author based on the theme of the text, their word choices, and core sentences.
+
+              Snippet of Text: {{inputs.text}}
+
+              The sentiment analysis method is based on the {{classes}}. It is vital that you only classify the Snippet of Text using the sentiment analysis method provided. 
+
+              Take your time and think through the reasons why the Snippet of Text matches the sentiment analysis you are considering. Provide the sentiment analysis and explain your reasoning. Fill in the following:
+
+              Sentiment:
+              Word Choices:
+              Reasoning:
+            role: assistant
+      block_is_output: false
+      dependencies:
+        - block_id: classes
+          ui:
+            edge_type: addBlock
+      input_schema: {}
+      output_schema: []
+      ui:
+        position:
+          x: -197
+          'y': 278
+      trigger_config: null
+    - block_archetype_id: com.scoutos.llm
+      block_config: []
+      block_display_name: Classify (JSON)
+      block_id: classify_json
+      block_inputs:
+        model: gpt-4o
+        response_format: json_object
+        max_tokens: 500
+        temperature: 0.7
+        prompt_items:
+          - content: |-
+              You are an expert in lingusitics. You're reviewing a Snippet of Text to determine the sentiment of the author based on the theme of the text, their word choices, and core sentences.
+
+              Snippet of Text: {{inputs.text}}
+
+              The sentiment analysis method is based on the {{classes}}. It is vital that you only classify the Snippet of Text using the sentiment analysis method provided. 
+
+              Take your time and think through the reasons why the Snippet of Text matches the sentiment analysis you are considering. Provide the sentiment analysis and explain your reasoning.
+
+              Output your response as JSON with the following attrbutes:
+              {
+                Sentiment:
+                Word Choices:
+                Core Sentences:
+                Reasoning:
+              }
+            role: assistant
+      block_is_output: false
+      dependencies:
+        - block_id: classes
+          ui:
+            edge_type: addBlock
+      input_schema: {}
+      output_schema: []
+      ui:
+        position:
+          x: 190
+          'y': 279
+      trigger_config: null

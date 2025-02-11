@@ -1,0 +1,83 @@
+workflow_key: blog_to_facebook_post
+workflow_config:
+  workflow_display_name: Blog to Facebook Post
+  workflow_schema_version: '1.0'
+  workflow_img_url: null
+  workflow_description: null
+  blocks:
+    - block_archetype_id: com.scoutos.input
+      block_config: []
+      block_display_name: Blog Article
+      block_id: blog
+      block_inputs:
+        items:
+          - display_name: Blog Article
+            input_type: long_text
+            is_optional: false
+            default_value: ''
+            key: article
+          - display_name: Tone
+            input_type: short_text
+            is_optional: false
+            default_value: formal
+            key: tone
+      block_is_output: false
+      dependencies: []
+      input_schema: {}
+      output_schema: []
+      ui:
+        position:
+          x: 0
+          'y': 0
+      trigger_config: null
+    - block_archetype_id: com.scoutos.llm
+      block_config: []
+      block_display_name: Summarize
+      block_id: summary
+      block_inputs:
+        model: gpt-4o
+        response_format: text
+        max_tokens: 3000
+        temperature: 0.7
+        prompt_items:
+          - content: 'You are an expert social media marketer. Summarize the content in {{blog.article}} so that the summary includes highlights that will be useful for generating social media posts.'
+            role: assistant
+      block_is_output: false
+      dependencies:
+        - block_id: blog
+          ui:
+            edge_type: addBlock
+      input_schema: {}
+      output_schema: []
+      ui:
+        position:
+          x: 0
+          'y': 98
+      trigger_config: null
+    - block_archetype_id: com.scoutos.llm
+      block_config: []
+      block_display_name: Facebook Posts
+      block_id: facebook
+      block_inputs:
+        model: gpt-4o
+        response_format: text
+        max_tokens: 1000
+        temperature: 0.7
+        prompt_items:
+          - content: |-
+              You are an expert marketer on Facebook.
+
+              Rewrite the content from the {{summary}} so that it has a {{tone}} tone. Generate 3 example Facebook posts with a {{tone}} tone.
+            role: assistant
+      block_is_output: false
+      dependencies:
+        - block_id: summary
+          ui:
+            edge_type: addBlock
+      input_schema: {}
+      output_schema: []
+      ui:
+        position:
+          x: 0
+          'y': 201
+      trigger_config: null
