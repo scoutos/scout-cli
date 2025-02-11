@@ -142,6 +142,7 @@ scout-cli init --template <template_id>
 ```
 
 This will:
+
 - Create a new workflow configuration file in your current directory
 - Name the file based on the template name (e.g., `ai_slack_bot_advanced.yml`)
 
