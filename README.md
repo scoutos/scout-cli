@@ -173,7 +173,7 @@ A **Scout AI Workflows as Code** project follows a structured hierarchy:
 │   │   ├── default.json
 │   ├── meta.ts
 │
-└── scout.config.js
+└── scout.config.ts
 ```
 
 ### **🔹 Key Components:**
