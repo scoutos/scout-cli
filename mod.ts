@@ -112,7 +112,7 @@ async function executeEphemeralWorkflow(
   try {
     console.log(bold(green("Executing workflow @")), config);
     const configData = await Deno.readTextFile(config);
-    const configJson = parse(configData);
+    const configJson = parse(configData) as any;
 
     let inputsJson: string;
     if (inputs) {
@@ -128,11 +128,10 @@ async function executeEphemeralWorkflow(
     console.log(bold("Inputs JSON:"), inputsJson);
 
     const startTime = performance.now();
-    const result: Scout.WorkflowsRunWithConfigResponse =
-      await client.workflows.runWithConfig({
-        inputs: JSON.parse(inputsJson),
-        workflow_config: configJson as Scout.WorkflowConfigInput,
-      });
+    const result: any = await client.workflows.runWithConfig({
+      inputs: JSON.parse(inputsJson),
+      workflow_config: configJson as any,
+    });
     const endTime = performance.now();
     const latency = endTime - startTime;
 
@@ -264,7 +263,7 @@ async function findRootDir(): Promise<string | null> {
   let currentDir = Deno.cwd();
   while (true) {
     console.log("currentDir", currentDir);
-    currentDir = `${currentDir}/ioio`;
+    currentDir = `${currentDir}`;
     try {
       const entries = await Deno.readDir(currentDir);
       for await (const entry of entries) {
@@ -523,6 +522,7 @@ const linkCommand: CommandType = new Command()
 
     if (hasAccount === "no") {
       console.log(bold("Opening sign-up page..."));
+      // @ts-ignore
       await Deno.run({
         cmd: ["open", "https://studio.scoutos.com/onboarding/step-1"],
       }).status();

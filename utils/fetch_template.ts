@@ -61,18 +61,19 @@ async function listTemplates() {
 
 function removeUnwantedNodes(blocks: Array<Record<string, unknown>>) {
   return blocks.map((block) => {
-    // deno-lint-ignore no-unused-vars
     const {
-      block_is_output,
-      input_schema,
-      output_schema,
-      ui,
+      _block_is_output,
+      _input_schema,
+      _output_schema,
+      _ui,
       dependencies,
-      trigger_config,
+      _trigger_config,
       ...rest
     } = block;
+
+    // @ts-ignore: dependency type
     const cleanedDependencies = dependencies?.map((dep) => {
-      const { ui, ...depRest } = dep;
+      const { _ui, ...depRest } = dep;
       return depRest;
     });
     return { ...rest, dependencies: cleanedDependencies };
