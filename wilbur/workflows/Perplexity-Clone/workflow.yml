@@ -1,7 +1,0 @@
-workflow_key: perplexity_clone
-workflow_config:
-  workflow_display_name: Perplexity Clone
-  workflow_schema_version: '1.0'
-  workflow_img_url: null
-  workflow_description: null
-  blocks: []
