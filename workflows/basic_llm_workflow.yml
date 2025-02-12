@@ -1,0 +1,54 @@
+workflow_key: basic_llm_workflow
+workflow_config:
+  workflow_display_name: Basic LLM Workflow
+  workflow_schema_version: '1.0'
+  workflow_img_url: null
+  workflow_description: null
+  blocks:
+    - block_archetype_id: com.scoutos.input
+      block_config: []
+      block_display_name: Inputs
+      block_id: inputs
+      block_inputs:
+        items:
+          - display_name: User's Message
+            key: user_message
+            input_type: long_text
+      block_is_output: false
+      input_schema: {}
+      output_schema: []
+      ui:
+        position:
+          x: -3
+          'y': -83
+      trigger_config: null
+      ignore_error: false
+      dependencies: []
+    - block_archetype_id: com.scoutos.llm
+      block_config: []
+      block_display_name: LLM
+      block_id: llm_response
+      block_inputs:
+        model: gpt-4o
+        response_format: text
+        max_tokens: 3000
+        temperature: 0.7
+        items: []
+        prompt_items:
+          - content: You are a helpful assistant named Scout.
+            role: system
+          - content: '{{inputs.user_message}}'
+            role: user
+      block_is_output: false
+      input_schema: {}
+      output_schema: []
+      ui:
+        position:
+          x: 2
+          'y': 34
+      trigger_config: null
+      ignore_error: false
+      dependencies:
+        - block_id: inputs
+          ui:
+            edge_type: addBlock
