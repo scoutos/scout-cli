@@ -119,6 +119,7 @@ To run a specific workflow, use the following command:
 
 ```sh
 scout workflows run <workflow_folder>
+```
 
 Replace `<workflow_folder>` with the folder name of the workflow you want to run
 
