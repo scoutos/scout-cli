@@ -123,8 +123,6 @@ scout workflows run <workflow_folder>
 
 Replace `<workflow_folder>` with the folder name of the workflow you want to run
 
-
-
 ### Deploy a Workflow
 
 To deploy a workflow, use the following command:
