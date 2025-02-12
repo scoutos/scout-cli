@@ -30,7 +30,7 @@
 
 ```sh
 # Move & rename executable
-sudo mv scout-cli /usr/local/bin/scout
+sudo mv scout-cli-macos /usr/local/bin/scout
 
 # Make the executable runnable
 sudo chmod +x /usr/local/bin/scout

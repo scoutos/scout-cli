@@ -506,10 +506,9 @@ const initCommand: CommandType = new Command()
       const { slugifiedTemplateName } = await scaffoldProject(projectName)
 
       console.log(bold(cyan(`\nNext steps:`)))
-      console.log(bold(`  1. ${cyan(`cd ${projectName}`)}`))
-      console.log(
-        bold(`  2. ${cyan(`scout workflows run ${slugifiedTemplateName}`)}`),
-      )
+      console.log(bold(`  1. ${cyan(`cd ${projectName}`)} - Navigate to your new project directory`))
+      console.log(bold(`  2. ${cyan(`scout workflows run ${slugifiedTemplateName}`)} - Run the workflow to see it in action`))
+      console.log(bold(`  3. ${cyan(`scout workflows deploy ${slugifiedTemplateName}`)} - Deploy the workflow to Scout`))
       console.log(bold(`\nHappy scouting! 🚀`))
     } catch (error: unknown) {
       const errorMessage = error instanceof Error
