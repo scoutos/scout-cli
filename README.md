@@ -133,6 +133,8 @@ scout workflows run <workflow_folder> -i <inputs>
 
 Replace `<workflow_folder>` with the folder name of the workflow you want to run and `<inputs>` with the JSON string of inputs for the workflow.
 
+If the `-i` argument is not used, it will default to the inputs in `inputs/default.json`.
+
 ### Deploy a Workflow
 
 To deploy a workflow, use the following command:
