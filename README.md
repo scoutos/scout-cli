@@ -210,4 +210,3 @@ deno task dev workflows deploy --config ./examples/starter/workflows/source_mapp
 3. Now you should be able to use `scout` from your system! Trying running `scout --help` to see if it works.
 4. If you want to remove the cli you can run `sudo rm /usr/local/bin/scout`.
 5. **Note**: You may have to grant the cli permissions to write, read, delete to your system.
-```
