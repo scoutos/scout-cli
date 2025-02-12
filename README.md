@@ -26,12 +26,9 @@
 
 1. Download the macOS executable from the [Latest Release](https://github.com/scoutos/scout-cli/releases/tag/latest/scout-cli-macos).
 
-2. If you downloaded the zipped artifact, unzip the file then run the following commands to make the executable available on your system:
+2. Move and authorize the downloaded file:
 
 ```sh
-# Download the executable
-curl -L https://github.com/scoutos/scout-cli/releases/download/v1.2.3/scout-cli-macos -o scout-cli
-
 # Move & rename executable
 sudo mv scout-cli /usr/local/bin/scout
 
@@ -54,12 +51,9 @@ sudo rm /usr/local/bin/scout
 
 1. Download the Linux executable from the [Latest Release](https://github.com/scoutos/scout-cli/releases/tag/latest/scout-cli-linux).
 
-2. If you downloaded the zipped artifact, unzip the file then run the following commands to make the executable available on your system:
+2. Move and authorize the downloaded file:
 
 ```sh
-# Download the executable
-curl -L https://github.com/scoutos/scout-cli/releases/download/v1.2.3/scout-cli-linux -o scout-cli
-
 # Move & rename executable
 sudo mv scout-cli /usr/local/bin/scout
 
@@ -82,12 +76,9 @@ sudo rm /usr/local/bin/scout
 
 1. Download the Windows executable from the [Latest Release](https://github.com/scoutos/scout-cli/releases/tag/latest/scout-cli-windows.exe).
 
-2. If you downloaded the zipped artifact, unzip the file then run the following commands to make the executable available on your system:
+2. Move and authorize the downloaded file:
 
 ```sh
-# Download the executable
-curl -L https://github.com/scoutos/scout-cli/releases/download/v1.2.3/scout-cli-windows.exe -o scout-cli.exe
-
 # Move & rename executable
 move scout-cli.exe C:\Windows\System32\scout.exe
 ```
