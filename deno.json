@@ -6,7 +6,7 @@
     "lint": "deno lint",
     "format": "deno fmt",
     "build": "deno compile --allow-read --allow-write --allow-env --allow-net --output scout-cli-macos mod.ts",
-    "dev": "deno run --allow-read --allow-write --allow-env --allow-net mod.ts",
+    "dev": "deno run --allow-read --allow-write --allow-env --allow-net --allow-run=\"open\" mod.ts",
     "test": "deno test --allow-read --allow-write --allow-env --allow-net mod_test.ts",
     "test:watch": "deno test --allow-read --allow-write --allow-env --allow-net --watch mod_test.ts",
     "cache": "deno cache mod_test.ts"
