@@ -3,70 +3,185 @@
 `scout-cli` allows one to interact with and update Scout workflows via
 [CLI](https://en.wikipedia.org/wiki/Command-line_interface) commands.
 
+## Table of Contents
+
+- [Using `scout-cli`](#using-scout-cli)
+  - [Setup](#setup)
+    - [macOS](#macos)
+    - [Linux](#linux)
+    - [Windows](#windows)
+  - [Connect to Your Scout Account](#connect-to-your-scout-account)
+  - [Initialize a Scout Project](#initialize-a-scout-project)
+  - [Run a Workflow](#run-a-workflow)
+  - [Deploy a Workflow](#deploy-a-workflow)
+  - [Get a Workflow](#get-a-workflow)
+- [AI Workflow Project Structure](#ai-workflow-project-structure)
+- [Local Development](#local-development)
+
 ## Using `scout-cli`
 
 ### Setup
 
-1. Download the appropriate executable for your system from the [Latest Release](https://github.com/scoutos/scout-cli/releases/tag/latest/). For this example we will download the `scout-cli-macos` artifact.
+#### macOS
 
-- [macos](https://github.com/scoutos/scout-cli/releases/tag/latest/scout-cli-macos).
-- [linux](https://github.com/scoutos/scout-cli/releases/tag/latest/scout-cli-linux).
-- [windows](https://github.com/scoutos/scout-cli/releases/tag/latest/scout-cli-windows.exe).
-- Alternatively, you can build the cli from source `deno compile --allow-read --allow-write --allow-env --allow-net --output scout-cli-macos mod.ts`.
+1. Download the macOS executable from the [Latest Release](https://github.com/scoutos/scout-cli/releases/tag/latest/scout-cli-macos).
 
-2. You might need to move & rename the executable to a location where your system can find it.
+2. If you downloaded the zipped artifact, unzip the file then run the following commands to make the executable available on your system:
 
-```bash
-# Move & rename executable 
-sudo mv scout-cli-macos /usr/local/bin/scout
+```sh
+# Download the executable
+curl -L https://github.com/scoutos/scout-cli/releases/download/v1.2.3/scout-cli-macos -o scout-cli
+
+# Move & rename executable
+sudo mv scout-cli /usr/local/bin/scout
+
+# Make the executable runnable
+sudo chmod +x /usr/local/bin/scout
 ```
 
-3. Now you should be able to use `scout` from your system! Trying running `scout --help` to see if it works.
-4. If you want to remove the cli you can run `sudo rm /usr/local/bin/scout`.
-5. **Note**: You may have to grant the cli permissions to write, read, delete to your system.
+3. Now you should be able to use `scout` from your system! Try running `scout --help` to see if it works.
+
+4. If you want to remove the CLI, you can run:
+
+```sh
+sudo rm /usr/local/bin/scout
+```
+
+5. **Note**: You may have to grant the CLI permissions to write, read, and delete on your system.
    - `sudo chmod +x /usr/local/bin/scout`
 
-### API Key
+#### Linux
 
-1. When you first use the cli tool, you will be asked to set your `apikey`. This should be the secret key found in "API Keys" section in the Scout dashboard settings panel. The api key will be stored in `~/.scout-cli/secrets.json`.
-2. Alternatively, you can set the `SCOUT_API_KEY` environment variable. This is useful if you want to use the cli in a CI/CD pipeline.
+1. Download the Linux executable from the [Latest Release](https://github.com/scoutos/scout-cli/releases/tag/latest/scout-cli-linux).
 
-Example command:
+2. If you downloaded the zipped artifact, unzip the file then run the following commands to make the executable available on your system:
 
-```bash
-scout workflows deploy --config ./workflows/top_trending.yml
+```sh
+# Download the executable
+curl -L https://github.com/scoutos/scout-cli/releases/download/v1.2.3/scout-cli-linux -o scout-cli
+
+# Move & rename executable
+sudo mv scout-cli /usr/local/bin/scout
+
+# Make the executable runnable
+sudo chmod +x /usr/local/bin/scout
 ```
 
-```bash
-scout workflows run --config ./workflows/top_trending.yml --inputs ./inputs/top_trending.json
+3. Now you should be able to use `scout` from your system! Try running `scout --help` to see if it works.
+
+4. If you want to remove the CLI, you can run:
+
+```sh
+sudo rm /usr/local/bin/scout
 ```
 
-### Using Templates
+5. **Note**: You may have to grant the CLI permissions to write, read, and delete on your system.
+   - `sudo chmod +x /usr/local/bin/scout`
 
-The CLI provides commands to work with workflow templates:
+#### Windows
 
-1. List all available templates:
+1. Download the Windows executable from the [Latest Release](https://github.com/scoutos/scout-cli/releases/tag/latest/scout-cli-windows.exe).
 
-```bash
-scout init --template-list
+2. If you downloaded the zipped artifact, unzip the file then run the following commands to make the executable available on your system:
+
+```sh
+# Download the executable
+curl -L https://github.com/scoutos/scout-cli/releases/download/v1.2.3/scout-cli-windows.exe -o scout-cli.exe
+
+# Move & rename executable
+move scout-cli.exe C:\Windows\System32\scout.exe
 ```
 
-2. Initialize a workflow from a template:
+3. Now you should be able to use `scout` from your system! Try running `scout --help` to see if it works.
 
-```bash
-scout init --template <template_id>
+4. If you want to remove the CLI, you can run:
+
+```sh
+del C:\Windows\System32\scout.exe
 ```
 
-This will:
+5. **Note**: You may have to grant the CLI permissions to write, read, and delete on your system.
+   - `icacls C:\Windows\System32\scout.exe /grant Everyone:F`
 
-- Create a new workflow configuration file in your current directory
-- Name the file based on the template name (e.g., `ai_slack_bot_advanced.yml`)
+### Connect to Your Scout Account
 
-3. You can then deploy this template using the deploy command:
+Authenticate your local environment with:
 
-```bash
-scout workflows deploy --config ./workflows/name_of_your_workflow.yml
+```sh
+scout link
 ```
+
+This will securely connect your CLI to your **Scout account**.
+
+### Initialize a Scout Project
+
+To start a new Scout project in your local directory, run:
+
+```sh
+scout init
+```
+
+The CLI will walk you through the setup process.
+
+### Run a Workflow
+
+To run a specific workflow, use the following command:
+
+```sh
+scout workflows run <workflow_folder> -i <inputs>
+```
+
+Replace `<workflow_folder>` with the folder name of the workflow you want to run and `<inputs>` with the JSON string of inputs for the workflow.
+
+### Deploy a Workflow
+
+To deploy a workflow, use the following command:
+
+```sh
+scout workflows deploy -c <config>
+```
+
+Replace `<config>` with the path to the config file of the workflow you want to deploy.
+
+### Get a Workflow
+
+To get a specific workflow, use the following command:
+
+```sh
+scout workflows get <workflow_id> -o <output>
+```
+
+Replace `<workflow_id>` with the ID of the workflow you want to get and `<output>` with the path to save the output.
+
+---
+
+## 📁 AI Workflow Project Structure
+
+A **Scout AI Workflows as Code** project follows a structured hierarchy:
+
+```
+/workflows
+├── workflow_1/
+│   ├── workflow.yml
+│   ├── inputs/
+│   │   ├── default.json
+│   ├── meta.ts
+│
+├── workflow_2/
+│   ├── workflow.yml
+│   ├── inputs/
+│   │   ├── default.json
+│   ├── meta.ts
+│
+└── scout.config.js
+```
+
+### **🔹 Key Components:**
+
+- **`workflow.yml`** – Defines each AI workflow.
+- **`inputs/default.json`** – Stores default input parameters for the workflow.
+- **`meta.ts`** – Metadata and additional configuration for the workflow.
+- **`scout.config.js`** – Configuration settings for your Scout project.
 
 ## Local Development
 
