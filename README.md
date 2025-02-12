@@ -14,7 +14,6 @@
   - [Initialize a Scout Project](#initialize-a-scout-project)
   - [Run a Workflow](#run-a-workflow)
   - [Deploy a Workflow](#deploy-a-workflow)
-  - [Get a Workflow](#get-a-workflow)
 - [AI Workflow Project Structure](#ai-workflow-project-structure)
 - [Local Development](#local-development)
 
@@ -119,32 +118,19 @@ The CLI will walk you through the setup process.
 To run a specific workflow, use the following command:
 
 ```sh
-scout workflows run <workflow_folder> -i <inputs>
-```
+scout workflows run <workflow_folder>
 
-Replace `<workflow_folder>` with the folder name of the workflow you want to run and `<inputs>` with the JSON string of inputs for the workflow.
+Replace `<workflow_folder>` with the folder name of the workflow you want to run
 
-If the `-i` argument is not used, it will default to the inputs in `inputs/default.json`.
+
 
 ### Deploy a Workflow
 
 To deploy a workflow, use the following command:
 
 ```sh
-scout workflows deploy -c <config>
+scout workflows deploy <workflow_folder>
 ```
-
-Replace `<config>` with the path to the config file of the workflow you want to deploy.
-
-### Get a Workflow
-
-To get a specific workflow, use the following command:
-
-```sh
-scout workflows get <workflow_id> -o <output>
-```
-
-Replace `<workflow_id>` with the ID of the workflow you want to get and `<output>` with the path to save the output.
 
 ---
 
