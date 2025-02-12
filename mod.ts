@@ -359,8 +359,8 @@ const getCommand: CommandType = new Command()
 
 const deployCommand: CommandType = new Command()
   .description('Deploy a workflow')
-  .option('-c, --config <config:string>', 'Path to the config file')
-  .action(async ({ config }) => {
+  .arguments('<workflow_folder:string>')
+  .action(async (_data, workflowFolder: string) => {
     let apiKey = await getStoredApiKey()
     if (!apiKey) {
       console.log(bold('Please enter your API key:'))
@@ -371,10 +371,15 @@ const deployCommand: CommandType = new Command()
       }
       await saveApiKey(apiKey)
     }
-    if (!config) {
-      console.error(bold(red('Config is required')))
+
+    const rootDir = await findRootDir()
+    if (!rootDir) {
+      console.error(bold(red('Could not find the root directory.')))
       Deno.exit(1)
     }
+
+    const config = join(rootDir, 'workflows', workflowFolder, 'workflow.yml')
+
     await deployWorkflow(config, apiKey)
   })
 
